@@ -8,4 +8,4 @@
 
 ## Reporting a Vulnerability
 
-TBA
+For now please send an email to admin@phpjunction.com
