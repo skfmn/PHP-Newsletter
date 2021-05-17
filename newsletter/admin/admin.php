@@ -25,7 +25,7 @@ if (isset($_SESSION["msg"])) {
   $baseDir = BASEDIR;
   $baseDir = str_replace("\\\\","\\", $baseDir."newsleeter\\install\\");
   $dir = $baseDir;
- //if (is_dir($dir)) { deleteDir($dir); }
+ if (is_dir($dir)) { deleteDir($dir); }
 
   $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
 
