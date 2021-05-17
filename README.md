@@ -5,4 +5,4 @@ This is my first PHP APP and my first time using Git and GitHub as you can see b
 
 So anyway any help and contributions to the project are welcome!
 
-The install.php file is incomplete and won't work as is!
+NOTE: all files and folders marked 'not need for production' are indeed needed for production!
