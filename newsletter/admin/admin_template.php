@@ -5,7 +5,7 @@
   include '../includes/functions.php';
 
   $cookies = $dir = $username = $password = $encrPassword = "";
-	$lngMemberID = $strRights = "";
+	$msg = $lngMemberID = $strRights = "";
   $send = $addresses = $images = $templates = $dbrights = $adminrights = $arights = "";
   $intTemplateID = $strTempTitle = $strTempDescr = $strTempBody = $strTempBody = "";
 
@@ -26,9 +26,13 @@
   
 	}
 
-  if ($msg <> "") {
-    displayFancyMsg(getMessage($msg));
-  }	
+if (isset($_SESSION["msg"])) {
+  $msg = $_SESSION["msg"];
+	if ($msg <> "") {
+		displayFancyMsg(getMessage($msg));
+		$_SESSION["msg"] = "";
+  }
+}
 	
 	if (isset($_POST["save"])) {
 	  
@@ -60,9 +64,9 @@
 			mysqli_stmt_bind_param($stmt, "sssss", $strTempTitle, $strTempBody, $strTempDescr, $templateSave, $intTemplateID);
 
 			if ($stmt->execute()) {
-        $msg = "Updated";
+        $_SESSION["msg"] = "Updated";
       } else {
-        $msg = "Error";
+        $_SESSION["msg"] = "Error";
       }
 
 		} else {
@@ -71,15 +75,15 @@
 			mysqli_stmt_bind_param($stmt,"ssss", $strTempTitle, $strTempBody, $strTempDescr, $templateSave);
 
 			if ($stmt->execute()) {
-        $msg = "Added";
+        $_SESSION["msg"] = "Added";
       } else {
-        $msg = "Error";
+        $_SESSION["msg"] = "Error";
       }
 
 		}
     mysqli_close($conn);
 
-    redirect($redirect."admin/admin_template.php?msg=".$msg);
+    redirect($redirect."admin/admin_template.php");
     ob_end_flush();
 		
 	}
@@ -100,13 +104,13 @@
 		mysqli_stmt_bind_param($stmt,"s", $lngTempplateID);
 
 		if ($stmt->execute()) {
-      $msg = "del";
+      $_SESSION["msg"] = "del";
     } else {
-      $msg = "Error";
+      $_SESSION["msg"] = "Error";
     }
     mysqli_close($conn);
 
-    redirect($redirect."admin/admin_template.php?msg=".$msg);
+    redirect($redirect."admin/admin_template.php");
     ob_end_flush();
 		
 	}

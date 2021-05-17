@@ -5,7 +5,7 @@
   include '../includes/functions.php';
 
   $cookies = $dir = $username = $password = $encrPassword = "";
-	$lngMemberID = $strRights = $strName = "";
+	$msg = $lngMemberID = $strRights = $strName = "";
   $send = $addresses = $images = $templates = $dbrights = $adminrights = $arights = "";
 
 	$cookies = $_SESSION["nwsadminname"];
@@ -25,9 +25,13 @@
   
 	}
 
-  if ($msg <> "") {
-    displayFancyMsg(getMessage($msg));
+if (isset($_SESSION["msg"])) {
+  $msg = $_SESSION["msg"];
+	if ($msg <> "") {
+		displayFancyMsg(getMessage($msg));
+		$_SESSION["msg"] = "";
   }
+}
 
 	if (isset($_GET["id"])) { $lngMemberID = test_input($_GET["id"]);}
 
@@ -153,7 +157,8 @@
 		}
     mysqli_close($conn);
 
-    redirect($redirect."admin/arights.php?msg=car&id=".$lngMemberID);
+		$_SESSION["msg"] = "car";
+    redirect($redirect."admin/arights.php?id=".$lngMemberID);
     ob_end_flush();
 
   }

@@ -2,12 +2,7 @@
   $siteTitle = $domain = $smtpServer =  $smtpPort = $smtpEmail = $smtpPassword = "";
   $smtpDebug = $smtpsecure = $rewrite = $smtpuse = $version = "";
 
-  $version = "1.0";
-
-  $msg = "";
-  if (isset($_GET['msg'])) {
-    $msg = test_input($_GET["msg"]);
-  }
+  $version = "1.0.0";
 
   $saveFile = "";
   $saveFile = $_SERVER["APPL_PHYSICAL_PATH"].str_replace("/","\\",GBDIR)."admin\images";

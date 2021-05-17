@@ -4,7 +4,7 @@
   include '../includes/globals.php';
   include '../includes/functions.php';
 
-  $cookies = $dir = "";
+  $msg = $cookies = $dir = "";
 	$cookies = $_SESSION["nwsadminname"];
 	
 	If ($cookies == "") {
@@ -14,14 +14,18 @@
   
 	}
 
-  if ($msg <> "") {
-    displayFancyMsg(getMessage($msg));
+if (isset($_SESSION["msg"])) {
+  $msg = $_SESSION["msg"];
+	if ($msg <> "") {
+		displayFancyMsg(getMessage($msg));
+		$_SESSION["msg"] = "";
   }
+}
 
   $baseDir = BASEDIR;
-  $baseDir = str_replace("\\\\","\\", $baseDir."guestbook\\install\\");
+  $baseDir = str_replace("\\\\","\\", $baseDir."newsleeter\\install\\");
   $dir = $baseDir;
-  if (is_dir($dir)) { deleteDir($dir); }
+ //if (is_dir($dir)) { deleteDir($dir); }
 
   $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
 

@@ -5,7 +5,7 @@
   include '../includes/functions.php';
 
   $cookies = $dir = $username = $password = $encrPassword = "";
-	$lngMemberID = $strRights = "";
+	$msg = $lngMemberID = $strRights = "";
   $send = $addresses = $images = $templates = $dbrights = $adminrights = $arights = "";
 
 	$cookies = $_SESSION["nwsadminname"];
@@ -24,9 +24,13 @@
   
 	}
 
-  if ($msg <> "") {
-    displayFancyMsg(getMessage($msg));
-  }	
+if (isset($_SESSION["msg"])) {
+  $msg = $_SESSION["msg"];
+	if ($msg <> "") {
+		displayFancyMsg(getMessage($msg));
+		$_SESSION["msg"] = "";
+  }
+}
 
   $dir = SAVEFILE;
   if (!is_dir($dir)) {

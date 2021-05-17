@@ -5,10 +5,14 @@
   require("../PHPMailer/src/Exception.php");
 	include "globals.php"; 
 	include "functions.php";
-
-  if ($msg <> "") {
-    displayFancyMsg(getMessage($msg));
+$msg = "";
+if (isset($_SESSION["msg"])) {
+  $msg = $_SESSION["msg"];
+	if ($msg <> "") {
+		displayFancyMsg(getMessage($msg));
+		$_SESSION["msg"] = "";
   }
+}
 
 ?>
 <!DOCTYPE HTML>
@@ -28,7 +32,7 @@
 <?PHP
 
 	$email = $confirm = $response = $param1 = $cancel = "";
-	$subject = $emailMsg = $headers = $error = $nemail = "";
+	$msg = $subject = $emailMsg = $headers = $error = $nemail = "";
 	$blnmsgsent = false;
 
   $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
@@ -94,7 +98,7 @@
 
 	  } else {
 
-      $param1 = date("m \/ d \/ Y");
+      $param1 = date("Y-m-d");
       $stmt = $conn->prepare("INSERT INTO ".DBPREFIX."addresses (email,datDate,confirm) VALUES (?,?,?)");
       $stmt->bind_param('sss', $email, $param1, $confirm);
 

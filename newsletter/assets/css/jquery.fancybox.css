@@ -26,12 +26,12 @@
 
 .fancybox-skin {
 	position: relative;
-	background: #f9f9f9;
+	background: #676767;
 	color: #444;
 	text-shadow: none;
 	-webkit-border-radius: 4px;
-	   -moz-border-radius: 4px;
-	        border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 }
 
 .fancybox-opened {

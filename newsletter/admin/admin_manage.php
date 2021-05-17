@@ -4,7 +4,7 @@
   include '../includes/globals.php';
   include '../includes/functions.php';
 
-  $cookies = "";
+  $msg = $cookies = "";
 	$cookies = $_SESSION["nwsadminname"];
 	
 	If ($cookies == "") {
@@ -24,9 +24,13 @@
   
 	}
 
-  if ($msg <> "") {
-    displayFancyMsg(getMessage($msg));
+if (isset($_SESSION["msg"])) {
+  $msg = $_SESSION["msg"];
+	if ($msg <> "") {
+		displayFancyMsg(getMessage($msg));
+		$_SESSION["msg"] = "";
   }
+}
 
   $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
 
@@ -48,7 +52,7 @@
 		$stmt->bind_param("s", $username);
 		$result = $stmt->get_result();
     if ($result->num_rows > 0) {
-		  $msg = "ant";
+		  $_SESSION["msg"] = "ant";
 		} else {
 
       $param1 = $username;
@@ -57,14 +61,14 @@
       $stmt->bind_param('sssssssss', $param1, $encrPassword, $param2, $param2, $param2, $param2, $param2, $param2, $param2);
 
       if ($stmt->execute()) {
-        $msg = "adad";
+        $_SESSION["msg"] = "adad";
       } else {
-        $msg = "error";
+        $_SESSION["msg"] = "error";
       }
 
 	  }
 
-    redirect($redirect."admin/admin_manage.php?msg=".$msg);
+    redirect($redirect."admin/admin_manage.php");
     ob_end_flush();
 		
 	}
@@ -87,12 +91,12 @@
     $stmt->bind_param("ss", $password, $cookies);
 
     if ($stmt->execute()) {
-      $msg = "cpwds";
+      $_SESSION["msg"] = "cpwds";
     } else {
-      $msg = "error";
+      $_SESSION["msg"] = "error";
     }
 
-    redirect($redirect."admin/admin_manage.php?msg=".$msg);
+    redirect($redirect."admin/admin_manage.php");
     ob_end_flush();
 		
 	}
@@ -113,8 +117,8 @@
 
     } else {
 
-		  $msg = "nadmin";
-      redirect($redirect."admin/admin.php?msg=".$msg);
+		  $_SESSION["msg"] = "nadmin";
+      redirect($redirect."admin/admin.php");
       ob_end_flush();
 
 		}
@@ -126,12 +130,12 @@
     $stmt->bind_param('ss', $password, $param1);
 
     if ($stmt->execute()) {
-      $msg = "capwds";
+      $_SESSION["msg"] = "capwds";
     } else {
-      $msg = "error";
+      $_SESSION["msg"] = "error";
     }
 
-    redirect($redirect."admin/admin.php?msg=".$msg);
+    redirect($redirect."admin/admin.php");
     ob_end_flush();
 		
 	}
@@ -143,12 +147,12 @@
 		$stmt->bind_param("s", $param1);
 
     if ($stmt->execute()) {
-      $msg = "das";
+      $_SESSION["msg"] = "das";
     } else {
-      $msg = "error";
+      $_SESSION["msg"] = "error";
     }
 		
-    redirect($redirect."admin/admin.php?msg=".$msg);
+    redirect($redirect."admin/admin.php");
     ob_end_flush();
 		
 	}

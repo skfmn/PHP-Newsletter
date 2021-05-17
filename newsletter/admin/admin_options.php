@@ -6,7 +6,7 @@
 
   $cookies = $dir = $username = $password = $encrPassword = $chmsgs = $count = "";
   $siteTitle = $urlrewrite = $smtpServer = $smtpEmail = $smtpPassword = $smtpDebug = $smtpuse = "";
-  $chvalue =  "";
+  $msg = $chvalue =  "";
 
 	$cookies = $_SESSION["nwsadminname"];
 
@@ -25,9 +25,13 @@
   
 	}
 
-  if ($msg <> "") {
-    displayFancyMsg(getMessage($msg));
+if (isset($_SESSION["msg"])) {
+  $msg = $_SESSION["msg"];
+	if ($msg <> "") {
+		displayFancyMsg(getMessage($msg));
+		$_SESSION["msg"] = "";
   }
+}
 
   $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
 
@@ -51,20 +55,19 @@
       $stmt->bind_param('ss', $param1, $param2);
 
 		  if ($stmt->execute()) {
-			  $msg = "mus";
+			  $_SESSION["msg"] = "mus";
       } else {
-        $msg = "error";
+        $_SESSION["msg"] = "error";
       }
     }
 
-    redirect($redirect."admin/admin_options.php?msg=".$msg);
+    redirect($redirect."admin/admin_options.php");
     ob_end_flush();
 		
 	}
 
 	if (isset($_POST["chumsg"])) {
 
-    //if (isset($_POST[""])) { ;}	
     $chumsgs = "";
 	  $chumsgs = $_POST["usermessages"];
     $count = count($chumsgs);
@@ -78,13 +81,13 @@
       $stmt->bind_param('ss', $param1, $param2);
 
 		  if ($stmt->execute()) {
-			  $msg = "mus";
+			  $_SESSION["msg"] = "mus";
       } else {
-        $msg = "error";
+        $_SESSION["msg"] = "error";
       }
     }
 
-    redirect($redirect."admin/admin_options.php?msg=".$msg);
+    redirect($redirect."admin/admin_options.php");
     ob_end_flush();
 		
 	}
@@ -125,12 +128,12 @@
     $stmt->bind_param('sssssss', $siteTitle, $smtpServer, $smtpEmail, $smtpPassword, $smtpDebug, $smtpUse, $urlrewrite);
 
 		if ($stmt->execute()) {
-			$msg = "siu";
+			$_SESSION["msg"] = "siu";
     } else {
-      $msg = "error";
+      $_SESSION["msg"] = "error";
     }
 
-    redirect($redirect."admin/admin_options.php?msg=".$msg);
+    redirect($redirect."admin/admin_options.php");
     ob_end_flush();
 
 	}

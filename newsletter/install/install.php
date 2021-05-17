@@ -27,7 +27,7 @@
   $step = isset($_GET["step"]) ? $_GET['step'] : "";
 
   $servname = $username = $dbpassword = $dbname = $dbprefix = $basedir = $gbdir = "";
-  $param1 = $param2 = $param3 = $param4 = $param5 = "";
+  $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = $param9 = "";
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -101,7 +101,7 @@
     </div>
   </div>
 <?php 
-  } else if ($step == "two") {
+   } else if ($step == "two") {
 
 ?>
   <div id="main" class="container" align="center">
@@ -126,17 +126,18 @@
 		echo "Creating Admin table...<br />";
 	
     $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."admin ( 
-            adminID INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+            adminID int(11) NOT NULL AUTO_INCREMENT ,
 	          name VARCHAR(255) NOT NULL ,
 	          pwd VARCHAR(255) NOT NULL ,
-            send VARCHAR(5) ,
-            addresses VARCHAR(5) ,
-            images VARCHAR(5),
-            templates VARCHAR(5) ,
-            db_rights VARCHAR(5) ,
-            admins_rights VARCHAR(5) ,
-            arights  VARCHAR(5) 
-            )";
+            send VARCHAR(5) DEFAULT NULL,
+            addresses VARCHAR(5) DEFAULT NULL,
+            images VARCHAR(5) DEFAULT NULL,
+            templates VARCHAR(5) DEFAULT NULL,
+            options VARCHAR(5) DEFAULT NULL,
+            admins_rights VARCHAR(5) DEFAULT NULL,
+            arights  VARCHAR(5) DEFAULT NULL,
+            PRIMARY KEY (`adminID`)
+            ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
 	 
     if ($conn->query($sql)) {
       echo "Admin table created successfully<br />";
@@ -149,8 +150,8 @@
 	  $tempPassword = password_hash("admin", PASSWORD_DEFAULT);
 
     $param1 = "admin";
-    $param2 = "yes";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."admin (name,pwd,send,addresses,images,templates,db_rights,admins_rights,arights) VALUES (?,?,?,?,?,?,?,?,?)");
+    $param2 = "true";
+    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."admin (name,pwd,send,addresses,images,templates,options,admins_rights,arights) VALUES (?,?,?,?,?,?,?,?,?)");
     $stmt->bind_param('sssssssss', $param1, $tempPassword, $param2, $param2, $param2, $param2, $param2, $param2, $param2);
 
     if ($stmt->execute()) {
@@ -162,13 +163,18 @@
     echo "Creating settings table...<br />";
 
     $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."settings ( 
-            settingID INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-	          site_title VARCHAR(255) ,
-	          domain_name VARCHAR(255) ,
-            smtp_server VARCHAR(255) ,
-            email_address VARCHAR(255) ,
-            smtp_password VARCHAR(255)
-            )";
+            settingID int(11) NOT NULL AUTO_INCREMENT ,
+	          site_title VARCHAR(255) DEFAULT NULL,
+	          domain_name VARCHAR(255) DEFAULT NULL,
+            smtp_server VARCHAR(255) DEFAULT NULL,
+            smtpport varchar(10) NOT NULL,
+            email_address VARCHAR(255) DEFAULT NULL,
+            smtp_password VARCHAR(255) DEFAULT NULL,
+            smtpdebug varchar(10) NOT NULL,
+            smtpuse varchar(10) NOT NULL,
+            rewrite varchar(10) NOT NULL,
+            PRIMARY KEY (`settingID`)
+            ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
 
     if ($conn->query($sql)) {
       echo "Settings created successfully<br /><br />";
@@ -179,10 +185,11 @@
 		echo "Creating Messages table...<br />";
 				  
     $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."messages (
-	          messageID INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	          messageID int(11) NOT NULL AUTO_INCREMENT ,
 	          msg VARCHAR(50) NOT NULL ,
-            message VARCHAR(50) NOT NULL
-            )";
+            message VARCHAR(150) NOT NULL,
+            PRIMARY KEY (`messageID`)
+            ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
 
     if ($conn->query($sql)) {
       echo "Messages table created successfully<br />";
@@ -194,91 +201,33 @@
   
     echo "Populating Messages table...<br />";
 
-	  $param1 = "eas";
-    $param2 ="The email was successfully added  to the database!";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
+    $sql = "INSERT INTO ".$dbprefix."messages (msg, message) VALUES
+    ('ds', 'The delete action was successful!'),
+    ('nea', 'You forgot to enter an email address!'),
+    ('uls', 'Image(s) uploaded successfully!'),
+    ('ids', 'Image(s) deleted successfully!'),
+    ('nadmin', 'You can not change Admins info.'),
+    ('del', 'Template deleted!'),
+    ('das', 'You successfully deleted the Admin.'),
+    ('adad', 'You have successfully added an Admin.'),
+    ('nt', 'That name has been taken.'),
+    ('tc', 'Template Created!'),
+    ('car', 'You have successfully modified Admin Rights'),
+    ('ulf', 'Upload failed!'),
+    ('nwst', 'Newsletter Sent!'),
+    ('ant', 'Admin name taken'),
+    ('ftna', 'Sorry, only JPG, PNG & GIF files are allowed.'),
+    ('fex', 'File already exists!'),
+    ('nimg', 'File is not an image.'),
+    ('tus', 'Template updated!'),
+    ('mus', 'Messages updated successfully!'),
+    ('error', 'An unknown error has occurred.<br />Please contact support.'),
+    ('siu', 'Site info updated successfully!'),
+    ('cpwds', 'You changed your password successfully!'),
+    ('nar', 'You have not been assigned rights to view this page.'),
+    ('eas', 'Email address added successfully!')";
 
-    $param1 = "aid";
-    $param2 ="That Email Address is already in the database!";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "ds";
-    $param2 ="The delete action was successful!";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "nea";
-    $param2 ="You forgot to enter an email address!";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "uls";
-    $param2 ="Image(s) uploaded successful!";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "ids";
-    $param2 ="Image(s) deleted successful!";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "nadmin";
-    $param2 ="You can not change Admins info.";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "del";
-    $param2 ="Template deleted!";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "das";
-    $param2 ="You successfully deleted the Admin.";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "adad";
-    $param2 ="You have successfully added an Admin.";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "nt";
-    $param2 ="That name has been taken.";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "tc";
-    $param2 ="Template Created!";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "car";
-    $param2 ="You have successfully modified Admin Rights";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    $param1 = "nwst";
-    $param2 ="Newsletter Sent!";
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."messages (msg,message) VALUES (?,?)");
-    $stmt->bind_param("ss", $param1, $param2);
-    $stmt->execute();
-
-    if ($stmt->execute()) {
+    if ($conn->query($sql)) {
       echo "Messages table populated successfully<br /><br />";
     } else {
       echo "Error: " . $sql . "<br>" . $conn->error;
@@ -287,28 +236,29 @@
 		echo "Creating Newsletter Addresses table...<br />";
 
     $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."addresses (
-	          NewsID INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-	          email VARCHAR(50) ,
-            datDate VARCHAR(50) ,
-            confirm VARCHAR(50)
-            )";
+	          NewsID int(11) NOT NULL AUTO_INCREMENT ,
+	          email VARCHAR(50) DEFAULT NULL,
+            datDate VARCHAR(50) DEFAULT NULL,
+            confirm VARCHAR(50) DEFAULT NULL,
+            PRIMARY KEY (`NewsID`)
+            ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
 
     if ($conn->query($sql)) {
       echo "Newsletter Addresses table created successfully<br />";
     } else {
       echo "Error: " . $sql . "<br>" . $conn->error;
     }
-				  
-		
+				  	
 		echo "Creating Newsletter table...<br />";
 
     $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."newsletter  (
-	          newsletterID INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-	          news_title VARCHAR(50) ,
-            news_save VARCHAR(50) ,
-            news_description VARCHAR(255) ,
-            news_body VARCHAR(8000)
-            )";
+	          newsletterID int(11) NOT NULL AUTO_INCREMENT ,
+	          news_title VARCHAR(50) DEFAULT NULL,
+            news_save VARCHAR(50) DEFAULT NULL,
+            news_description VARCHAR(255) DEFAULT NULL,
+            news_body text,
+            PRIMARY KEY (`newsletterID`)
+            ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
 
     if ($conn->query($sql)) {
       echo "Newsletter table created successfully<br />";
@@ -318,26 +268,52 @@
 				  
     echo "Populating Newsletter table...<br />";
 
-    $param1 = "Template One";
-    $param2 ="both";
-    $param3 = "A simple starting point!";
-    $param4 = '<header><h2 style="text-align:center;">Template One</h2></header><content><div style="text-align:center"><article><span style="font-size:16px;"> Hello World!</span></article></div></content><footer><div style="text-align:center">&copy; 2021 All Rights Reserved</div></footer>';
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."newsletter (news_title, news_save, news_description, news_body) VALUES (?,?,?,?)");
-    $stmt->bind_param("ssss", $param1, $param2, $param3, $param4);
-    $stmt->execute();
-	
-    $param1 = "Template Two";
-    $param2 ="both";
-    $param3 = "Another Simple Starting Point.";
-    $param4 = '<h2>Template Two</h2><table border="0" cellpadding="1" cellspacing="1" style="width:500px;"><tbody><tr><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table>';
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."newsletter (news_title,news_save,news_description,news_body) VALUES (?,?,?,?)");
-    $stmt->bind_param("ssss", $param1, $param2, $param3, $param4);
+    $sql =  "INSERT INTO ".$dbprefix."newsletter (news_title, news_save, news_description, news_body) VALUES
+            ('Template One', 'template', 'A simple starting point!', '&lt;header&gt;\r\n&lt;h2 style=&quot;text-align:center&quot;&gt;Template One&lt;/h2&gt;\r\n&lt;/header&gt;\r\n&lt;content&gt;\r\n&lt;div style=&quot;text-align:center&quot;&gt;\r\n&lt;article&gt;&lt;span style=&quot;font-size:16px&quot;&gt;Hello World!&lt;/span&gt;&lt;/article&gt;\r\n&lt;/div&gt;\r\n&lt;/content&gt;\r\n\r\n&lt;footer&gt;\r\n&lt;div style=&quot;text-align:center&quot;&gt;&amp;copy; 2021 All Rights Reserved&lt;/div&gt;\r\n&lt;/footer&gt;\r\n'),
+            ('Template Two', 'template', 'Another simple starting point!', '&lt;h2&gt;Template Two&lt;/h2&gt;\r\n\r\n&lt;table border=&quot;0&quot; cellpadding=&quot;1&quot; cellspacing=&quot;1&quot; style=&quot;width:500px&quot;&gt;\r\n	&lt;tbody&gt;\r\n		&lt;tr&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n		&lt;/tr&gt;\r\n		&lt;tr&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n		&lt;/tr&gt;\r\n		&lt;tr&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n		&lt;/tr&gt;\r\n	&lt;/tbody&gt;\r\n&lt;/table&gt;\r\n'),
+            ('Draft One', 'draft', 'A Rough Draft!', '&lt;h1&gt;This is an unfinished Draft!&lt;/h1&gt;\r\n&lt;span style=&quot;font-size:16px&quot;&gt;&lt;span style=&quot;font-family:Comic Sans MS~cursive&quot;&gt;&lt;span style=&quot;color:#1abc9c&quot;&gt;Finish it as you like!&lt;/span&gt;&lt;br /&gt;\r\n&lt;span style=&quot;color:#f1c40f&quot;&gt;Finish it as you like!&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;'),
+            ('Draft Two', 'draft', 'Another Rough Draft', '&lt;h1&gt;This is another Rough Draft!&lt;/h1&gt;\r\n')";
 
-    if ($stmt->execute()) {
+
+    if ($conn->query($sql)) {
       echo "Newsletter  table populated successfully<br /><br />";
     } else {
       echo "Error: " . $sql . "<br>" . $conn->error;
-    }		
+    }	
+    
+    echo "Creating End Messages table...<br />";
+
+    $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."endMsg  (
+            endMsgID int(11) NOT NULL AUTO_INCREMENT ,
+            endMsgName varchar(15) NOT NULL ,
+            endMsg text NOT NULL ,
+            PRIMARY KEY (`endMsgID`)
+            ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1" ;
+
+    if ($conn->query($sql)) {
+      echo "End Messages table created successfully<br />";
+    } else {
+      echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+
+    echo "Populating End Messages table...<br />";
+
+    $sql = "INSERT INTO ".$dbprefix."endMsg (endMsgName, endMsg) VALUES
+            ('thanks', '<h2>Thank you!</h2>\r\n#email# was added to our list<br />A confirmation email was sent please follow the instructions in it.<br />Be sure to check your Junk/Spam folder.'),
+            ('confirmed', '<h2>Success!</h2><br />#email# has been confirmed.<br /><br />Thank you for subscribing to the #sitetitle# newsletter.'),
+            ('confirmerr', '<h2>We''re Sorry</h2><br />There was a problem and we could not confirm #email#<br />Please try again or contact support.'),
+            ('alreadysubbed', '<h2>OOPS!</h2><br />It seems that #email# is already subscribed!<br />While we appreciate your enthusiasm you can only subscribe once!'),
+            ('thankserr', '<h2>Sorry?</h2><br />We were able to add #email# to our list. But could not send the confirmation email.<br />Please contact support!'),
+            ('adderr', '<h2>Sorry!</h2><br />There was a problem and we could not add #email# to our list.<br />Please try again or contact support.'),
+            ('notfound', '<h2>Sorry!</h2><br />We could not find #email# in our database.<br />Please contact support.'),
+            ('removed', '<h2>Success!</h2>#email# has been removed from our list.<br />We are sorry to see you go!'),
+            ('removederr', '<h2>Sorry!</h2>There was a problem and we could not remove #email# from our list.<br />Please contact support!')";
+
+    if ($conn->query($sql)) {
+      echo "End Messages  table populated successfully<br /><br />";
+    } else {
+      echo "Error: " . $sql . "<br>" . $conn->error;
+    }	
 
 		echo "Creating database tables...Complete!<br /><br /><br />";
 
@@ -485,7 +461,7 @@
         <input type="hidden" name="dbprefix" value="<?php echo $dbprefix; ?>">
         <input type="hidden" name="gbdir" value="<?php echo $gbdir; ?>">
         <header>
-          <h2>Other stuff</h2>
+          <h2>Settings</h2>
         </header>
         <div class="row">
 
@@ -506,6 +482,13 @@
           <div class="-4u 4u 12u$(medium)" style="padding-bottom:20px;">
             <label for="smtpserver" style="text-align:left;">SMTP Server <span style="font-size:12px;">(If your not sure leave it blank)</span>
               <input type="text" name="smtpserver" />
+            </label>
+          </div>
+          <div class="4u 1u$"><span></span></div>
+
+          <div class="-4u 4u 12u$(medium)" style="padding-bottom:20px;">
+            <label for="smtpport" style="text-align:left;">SMTP Server <span style="font-size:12px;">(If your not sure leave it as is)</span>
+              <input type="text" name="smtpport" value="587" />
             </label>
           </div>
           <div class="4u 1u$"><span></span></div>
@@ -551,11 +534,15 @@
     $param1 = test_input($_POST["sitetitle"]);
     $param2 = test_input($_POST["domainname"]);
     $param3 = test_input($_POST["smtpserver"]);
-    $param4 = test_input($_POST["emailaddress"]);
-    $param5 = test_input($_POST["smtppwd"]);
-    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."settings (site_title,domain_name,smtp_server,email_address,smtp_password) VALUES (?,?,?,?,?)");
-    $stmt->bind_param("sssss", $param1, $param2, $param3, $param4, $param5);
+    $param4 = "587";
+    $param5 = test_input($_POST["emailaddress"]);
+    $param6 = test_input($_POST["smtppwd"]);
+    $param7 = "no";
+    $param8 = "yes";
+    $param9 = "no";
 
+    $stmt = $conn->prepare("INSERT INTO ".$dbprefix."settings (site_title, domain_name, smtp_server, smtpport, email_address, smtp_password, smtpdebug, smtpuse, rewrite) VALUES (?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("sssssssss", $param1, $param2, $param3, $param4, $param5, $param6, $param7, $param8, $param9);
 
     if ($stmt->execute() === TRUE) {
 
@@ -597,7 +584,7 @@
 <?php } else { ?>
   <div id="main" class="container" style="margin-top:-75px;">
     <div class="row">
-      <div class="-4u 4u$ 12u$(medium)" style="text-align:center;">
+      <div class="-3u 6u$ 12u$(medium)" style="text-align:center;">
         <span class="first">
 	      You are about to install PHPNewsletter.
 	      <br>
@@ -605,11 +592,11 @@
 	      <br><br>
         Before you start:
         <ul style="text-align:left;">
+          <li>Read the readme.txt carefully!</li>
           <li>Create the MySQL database on your server.</li>
-          <li>Take note of the Server Name. "localhost" will almost always work, in not contact your provider.</li>
-          <li>Other examples would be "mysql.example.com" or an IP address.</li>
-          <li>Also take note of the Database Name, User Name, and Password.</li>
-          <li>Also make sure you have "write" permissions to the folder.</li>
+          <li>Read the readme.txt carefully!</li>
+          <li>Make sure you have "write" permissions to the newsletter folder.</li>
+          <li>Read the readme.txt carefully!</li>
         </ul>
 	      <br><br>
 	      <input class="button" type="button" onClick="parent.location='install.php?step=one'" value="Continue">

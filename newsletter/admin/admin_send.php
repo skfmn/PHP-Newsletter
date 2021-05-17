@@ -7,9 +7,7 @@
   include '../includes/globals.php';
   include '../includes/functions.php';
 
-
-
-  $cookies = $dir = "";
+  $msg = $cookies = $dir = "";
 	$cookies = $_SESSION["nwsadminname"];
 	
 	if ($cookies == "") {
@@ -27,9 +25,13 @@
   
 	}
 
-  if ($msg <> "") {
-    displayFancyMsg(getMessage($msg));
+if (isset($_SESSION["msg"])) {
+  $msg = $_SESSION["msg"];
+	if ($msg <> "") {
+		displayFancyMsg(getMessage($msg));
+		$_SESSION["msg"] = "";
   }
+}
 	
 	
 	if (isset($_POST["save"])) {
@@ -56,9 +58,9 @@
 			$stmt->bind_param("sss", $tempTitle, $tempBody, $templateID);
 
 			if ($stmt->execute()) {
-        $msg = "tus";
+        $_SESSION["msg"] = "tus";
       } else {
-        $msg = "Error";
+        $_SESSION["msg"] = "Error";
       }
 
 		} else {
@@ -67,14 +69,14 @@
 			$stmt->bind_param("ss", $tempTitle, $tempBody);
 
 			if ($stmt->execute()) {
-        $msg = "tc";
+        $_SESSION["msg"] = "tc";
       } else {
-        $msg = "Error";
+        $_SESSION["msg"] = "Error";
       }
 		}
     mysqli_close($conn);
 
-    redirect($redirect."admin/admin_send.php?msg=".$msg);
+    redirect($redirect."admin/admin_send.php");
     ob_end_flush();
 		
 	}
@@ -94,13 +96,13 @@
 		$stmt->bind_param("s", $tempplateID);
 
 		if ($stmt->execute()) {
-      $msg = "del";
+      $_SESSION["msg"] = "del";
     } else {
-      $msg = "Error";
+      $_SESSION["msg"] = "Error";
     }
     mysqli_close($conn);
 
-    redirect($redirect."admin/admin_send.php?msg=".$msg);
+    redirect($redirect."admin/admin_send.php");
     ob_end_flush();
 		
 	}
@@ -125,6 +127,7 @@
     $attachment = "";
     echo "<div class=\"row uniform\">\n";
     echo "  <div class=\"-2u 8u$\">\n";
+    echo "    <h3>Output Window</h3><br />\n";
     echo "    <textarea rows=\"5\">\n";
 
     $email = $subject = $emailMsg = $semails = "";

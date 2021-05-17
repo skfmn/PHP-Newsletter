@@ -5,7 +5,8 @@
 *                                                   *
 * You may modify and distribute this script free of * 
 * charge as long as this readme.txt with the        *
-* copyright header remains with it.                 * 
+* copyright header remains with it                  *
+* or it is mentioned where you display your credits * 
 * YOU MAY NOT SELL THIS SCRIPT                      *
 *****************************************************
 
@@ -17,7 +18,7 @@ You will need to have your SMTP information handy: Server name, User Name, Passw
 
 Once you have created the Database, Upload the "newsletter" folder and all of it contents to the Root folder of your website.
 
-IMPORTANT: Make sure you have 'write' permissions on the newsletter folder after you upload it!
+:IMPORTANT: Make sure you have 'write' permissions on the newsletter folder after you upload it! :IMPORTANT:
 
 Navigate to http://www.yourwebsite.com/newsletter/install/install.php and follow the instructions.
 

@@ -4,7 +4,7 @@
   include '../includes/globals.php';
   include '../includes/functions.php';
 
-  $cookies = $dir = "";
+  $msg = $cookies = $dir = "";
 	$cookies = $_SESSION["nwsadminname"];
 	
 	If ($cookies == "") {
@@ -22,9 +22,13 @@
   
 	}
 
-  if ($msg <> "") {
-    displayFancyMsg(getMessage($msg));
+if (isset($_SESSION["msg"])) {
+  $msg = $_SESSION["msg"];
+	if ($msg <> "") {
+		displayFancyMsg(getMessage($msg));
+		$_SESSION["msg"] = "";
   }
+}
 
   $templateTitle = $templateDescr = $templateBody = $templateSave = "";
 
