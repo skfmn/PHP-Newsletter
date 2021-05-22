@@ -6,31 +6,31 @@
 
   $msg = $cookies = $dir = "";
 	$cookies = $_SESSION["nwsadminname"];
-	
+
 	If ($cookies == "") {
 
     redirect($redirect."admin/login.php");
     ob_end_flush();
-  
+
 	}
 
-if (isset($_SESSION["msg"])) {
-  $msg = $_SESSION["msg"];
-	if ($msg <> "") {
-		displayFancyMsg(getMessage($msg));
-		$_SESSION["msg"] = "";
+  if (isset($_SESSION["msg"])) {
+    $msg = $_SESSION["msg"];
+	  if ($msg <> "") {
+		  displayFancyMsg(getMessage($msg));
+		  $_SESSION["msg"] = "";
+    }
   }
-}
 
   $baseDir = BASEDIR;
   $baseDir = str_replace("\\\\","\\", $baseDir."newsleeter\\install\\");
   $dir = $baseDir;
- if (is_dir($dir)) { deleteDir($dir); }
+  if (is_dir($dir)) { deleteDir($dir); }
 
   $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
 
 	if (!$conn) {
-  
+
 		die("Connection failed: " . mysqli_connect_error());
 	}
 
@@ -77,9 +77,9 @@ if (isset($_SESSION["msg"])) {
 				</ul>
 			</div>
       <div class="-3u 6u$ 12u$(medium)">
-       <iframe id="ifrm" name="ifrm" src="http://www.aspjunction.com/gnews.asp?ref=y&pnl=<?php echo $version; ?>" scrolling="yes" width="100%" height="100" frameborder="1"></iframe> 
+       <iframe id="ifrm" name="ifrm" src="http://www.aspjunction.com/gnews.asp?ref=y&pnl=<?php echo $version; ?>" scrolling="yes" width="100%" height="100" frameborder="1"></iframe>
       </div>
-      
+
     </div>
   </div>
 <?php include "../includes/footer.php"; ?>

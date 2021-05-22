@@ -6,22 +6,22 @@
 
   $msg = $cookies = "";
 	$cookies = $_SESSION["nwsadminname"];
-	
+
 	If ($cookies == "") {
 
     redirect($redirect."admin/login.php");
     ob_end_flush();
-  
+
 	}
 
-  $blnAdminRights = $_SESSION["blnAdminRights"]; 
+  $blnAdminRights = $_SESSION["blnAdminRights"];
   $blnARights = $_SESSION["blnARights"];
 
 	if ($blnAdminRights == "false") {
 
     redirect($redirect."admin/admin.php?msg=nar");
     ob_end_flush();
-  
+
 	}
 
 if (isset($_SESSION["msg"])) {
@@ -35,30 +35,36 @@ if (isset($_SESSION["msg"])) {
   $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
 
   if (!$conn) {
-  
+
     die("Connection failed: " . mysqli_connect_error());
   }
 
 	$dir = $username = $password = $encrPassword = "";
 
 	if (isset($_POST["newadmin"])) {
-	
+
+    $blnSelect = false;
 		$username = test_input($_POST["adminname"]);
 		$password = test_input($_POST["adpwd"]);
 
-    $encrPassword = password_hash($password, PASSWORD_DEFAULT);
+    $password = password_hash($password, PASSWORD_DEFAULT);
 
 		$stmt = $conn->prepare("SELECT * FROM ".DBPREFIX."admin WHERE name = ?");
 		$stmt->bind_param("s", $username);
+		$stmt->execute();
 		$result = $stmt->get_result();
     if ($result->num_rows > 0) {
-		  $_SESSION["msg"] = "ant";
+		  $blnSelect = false;
 		} else {
+      $blnSelect = true;
+	  }
+
+		if ($blnSelect) {
 
       $param1 = $username;
       $param2 = "no";
-      $stmt = $conn->prepare("INSERT INTO ".DBPREFIX."admin (name,pwd,send,addresses,images,templates,db_rights,admins_rights,arights) VALUES (?,?,?,?,?,?,?,?,?)");
-      $stmt->bind_param('sssssssss', $param1, $encrPassword, $param2, $param2, $param2, $param2, $param2, $param2, $param2);
+      $stmt = $conn->prepare("INSERT INTO ".DBPREFIX."admin (name,pwd,send,addresses,images,templates,options,admins_rights,arights) VALUES (?,?,?,?,?,?,?,?,?)");
+      $stmt->bind_param('sssssssss', $param1, $password, $param2, $param2, $param2, $param2, $param2, $param2, $param2);
 
       if ($stmt->execute()) {
         $_SESSION["msg"] = "adad";
@@ -66,23 +72,25 @@ if (isset($_SESSION["msg"])) {
         $_SESSION["msg"] = "error";
       }
 
-	  }
+		} else {
+			$_SESSION["msg"] = "ant";
+		}
 
     redirect($redirect."admin/admin_manage.php");
     ob_end_flush();
-		
+
 	}
-	
+
 	if (isset($_POST["chypwd"])) {
-		
+
 		$stmt = $conn->prepare("SELECT * FROM ".DBPREFIX."admin WHERE name = ?");
 		$stmt->bind_param("s", $cookies);
 		$stmt->execute();
 
     if ($result->num_rows > 0) {
-       
+
 	    $password = test_input($_POST["cypwd"]);
-	    
+
     }
 
     $password = password_hash($password, PASSWORD_DEFAULT);
@@ -98,11 +106,11 @@ if (isset($_SESSION["msg"])) {
 
     redirect($redirect."admin/admin_manage.php");
     ob_end_flush();
-		
+
 	}
-	
+
 	if (isset($_POST["chapwd"])) {
-		
+
     $param1 = test_input($_POST["cname"]);
 
 		$stmt = $conn->prepare("SELECT * FROM ".DBPREFIX."admin WHERE name = ?");
@@ -137,11 +145,11 @@ if (isset($_SESSION["msg"])) {
 
     redirect($redirect."admin/admin.php");
     ob_end_flush();
-		
+
 	}
-	
-	if (isset($_POST["deleteadmin"])) {
-	  
+
+	if (isset($_GET["delad"])) {
+
     $param1 = test_input($_GET["id"]);
 		$stmt = $conn->prepare("DELETE FROM ".DBPREFIX."admin WHERE adminID = ?");
 		$stmt->bind_param("s", $param1);
@@ -151,10 +159,10 @@ if (isset($_SESSION["msg"])) {
     } else {
       $_SESSION["msg"] = "error";
     }
-		
+
     redirect($redirect."admin/admin.php");
     ob_end_flush();
-		
+
 	}
 
   include "../includes/header.php";
@@ -188,7 +196,7 @@ if (isset($_SESSION["msg"])) {
       </div>
     </div>
   </div>
-  </form>	    
+  </form>
 
   <form action="admin_manage.php" method="post">
   <input type="hidden" name="chapwd" value="yes" />
@@ -211,7 +219,7 @@ if (isset($_SESSION["msg"])) {
         if ($name  <> "admin") { echo "            <option value=\"".$name."\">".$name."</option>"; }
 
       }
-    }  
+    }
 ?>
           </select>
         </div>
@@ -262,14 +270,14 @@ if (isset($_SESSION["msg"])) {
       <div class="12u 12u$(small)" style="padding-bottom:10px;">
         <hr />
         NOTE: Main Admin is not listed so you won't delete it!
-        <hr />     
+        <hr />
       </div>
 <?php
     $sql = "SELECT * FROM ".DBPREFIX."admin";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
-?>    
+?>
       <div class="12u 12u$(small)" style="padding-bottom:10px;">
         <div class="table-wrapper">
 					<table>
@@ -280,7 +288,7 @@ if (isset($_SESSION["msg"])) {
 ?>
               <tr>
                 <td>
-                  <?php echo $row["name"]; ?>&nbsp;&nbsp;<a onclick="return confirmSubmit('Are you SURE you want to delete this admin?','admin_manage.php?deleteadmin=yes&id=<?php echo $row["adminID"] ?>')" style="cursor:pointer; text-decoration:underline;">Delete</a>
+                  <?php echo $row["name"]; ?>&nbsp;&nbsp;<a onclick="return confirmSubmit('Are you SURE you want to delete this admin?','admin_manage.php?delad=yes&id=<?php echo $row["adminID"] ?>')" style="cursor:pointer; text-decoration:underline;">Delete</a>
                   <?php if ($blnARights) { ?>
                   &nbsp;&nbsp;<a href="arights.php?id=<?php echo $row["adminID"]; ?>" title="<?php echo $row["name"]; ?>">Assign Rights</a>
                   <?php } ?>
@@ -297,7 +305,7 @@ if (isset($_SESSION["msg"])) {
     }
     mysqli_close($conn);
 ?>
-      </div>     
+      </div>
     </div>
   </div>
 </div>

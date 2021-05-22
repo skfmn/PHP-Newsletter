@@ -1,9 +1,9 @@
-<?php 
-  ob_start(); 
+<?php
+  ob_start();
 
   function redirect($location) {
     if ($location) {
- 
+
       header('Location: ' . $location);
       exit;
 
@@ -44,15 +44,15 @@
     </div>
   </div>
 <?php
-  
-  if ($step == "one") { 
+
+  if ($step == "one") {
 
 ?>
   <div id="main" class="container" style="margin-top:-100px;text-align:center;">
     <div class="row 50%">
       <div class="12u 12u$(medium)">
         <form action="install.php?step=two" method="post">
-        
+
         <header>
           <h2>MySQL Database</h2>
         </header>
@@ -96,11 +96,11 @@
            <input class="button" type="submit" name="submit" value="Continue">
           </div>
         </div>
-        </form>     
+        </form>
       </div>
     </div>
   </div>
-<?php 
+<?php
    } else if ($step == "two") {
 
 ?>
@@ -116,29 +116,29 @@
     $dbprefix = test_input($_POST["dbprefix"]);
 
     $conn = mysqli_connect($servername, $username, $dbpassword, $dbname);
-		
+
     if (!$conn) {
-      die("Connection failed: " . mysqli_connect_error());
+      die("Connection failed: ".mysqli_connect_error());
     }
 
     echo "Creating Database Tables<br /><br />";
 
 		echo "Creating Admin table...<br />";
-	
-    $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."admin ( 
+
+    $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."admin (
             adminID int(11) NOT NULL AUTO_INCREMENT ,
 	          name VARCHAR(255) NOT NULL ,
 	          pwd VARCHAR(255) NOT NULL ,
-            send VARCHAR(5) DEFAULT NULL,
-            addresses VARCHAR(5) DEFAULT NULL,
-            images VARCHAR(5) DEFAULT NULL,
-            templates VARCHAR(5) DEFAULT NULL,
-            options VARCHAR(5) DEFAULT NULL,
-            admins_rights VARCHAR(5) DEFAULT NULL,
-            arights  VARCHAR(5) DEFAULT NULL,
-            PRIMARY KEY (`adminID`)
+            send VARCHAR(5) DEFAULT NULL ,
+            addresses VARCHAR(5) DEFAULT NULL ,
+            images VARCHAR(5) DEFAULT NULL ,
+            templates VARCHAR(5) DEFAULT NULL ,
+            options VARCHAR(5) DEFAULT NULL ,
+            admins_rights VARCHAR(5) DEFAULT NULL ,
+            arights  VARCHAR(5) DEFAULT NULL ,
+            PRIMARY KEY (adminID)
             ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
-	 
+
     if ($conn->query($sql)) {
       echo "Admin table created successfully<br />";
     } else {
@@ -158,11 +158,11 @@
       echo "Admin table populated successfully<br /><br />";
     } else {
       echo "Error: " . $sql . "<br>" . $conn->error;
-    } 
+    }
 
     echo "Creating settings table...<br />";
 
-    $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."settings ( 
+    $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."settings (
             settingID int(11) NOT NULL AUTO_INCREMENT ,
 	          site_title VARCHAR(255) DEFAULT NULL,
 	          domain_name VARCHAR(255) DEFAULT NULL,
@@ -173,7 +173,7 @@
             smtpdebug varchar(10) NOT NULL,
             smtpuse varchar(10) NOT NULL,
             rewrite varchar(10) NOT NULL,
-            PRIMARY KEY (`settingID`)
+            PRIMARY KEY (settingID)
             ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
 
     if ($conn->query($sql)) {
@@ -183,7 +183,7 @@
     }
 
 		echo "Creating Messages table...<br />";
-				  
+
     $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."messages (
 	          messageID int(11) NOT NULL AUTO_INCREMENT ,
 	          msg VARCHAR(50) NOT NULL ,
@@ -196,9 +196,7 @@
     } else {
       echo "Error: " . $sql . "<br>" . $conn->error;
     }
-  
-    echo "Populating Messages table...<br />";
-  
+
     echo "Populating Messages table...<br />";
 
     $sql = "INSERT INTO ".$dbprefix."messages (msg, message) VALUES
@@ -232,7 +230,7 @@
     } else {
       echo "Error: " . $sql . "<br>" . $conn->error;
     }
-  
+
 		echo "Creating Newsletter Addresses table...<br />";
 
     $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."addresses (
@@ -248,7 +246,7 @@
     } else {
       echo "Error: " . $sql . "<br>" . $conn->error;
     }
-				  	
+
 		echo "Creating Newsletter table...<br />";
 
     $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."newsletter  (
@@ -265,7 +263,7 @@
     } else {
       echo "Error: " . $sql . "<br>" . $conn->error;
     }
-				  
+
     echo "Populating Newsletter table...<br />";
 
     $sql =  "INSERT INTO ".$dbprefix."newsletter (news_title, news_save, news_description, news_body) VALUES
@@ -279,8 +277,8 @@
       echo "Newsletter  table populated successfully<br /><br />";
     } else {
       echo "Error: " . $sql . "<br>" . $conn->error;
-    }	
-    
+    }
+
     echo "Creating End Messages table...<br />";
 
     $sql = "CREATE TABLE IF NOT EXISTS ".$dbprefix."endMsg  (
@@ -313,7 +311,7 @@
       echo "End Messages  table populated successfully<br /><br />";
     } else {
       echo "Error: " . $sql . "<br>" . $conn->error;
-    }	
+    }
 
 		echo "Creating database tables...Complete!<br /><br /><br />";
 
@@ -339,12 +337,12 @@
            <input class="button" type="submit" name="submit" value="Continue">
           </div>
         </div>
-        </form>     
+        </form>
       </div>
     </div>
   </div>
-<?php  
-  } else if ($step == "three") { 
+<?php
+  } else if ($step == "three") {
 
   $absPath = "";
   $absPath = $_SERVER['DOCUMENT_ROOT']."\\";
@@ -363,7 +361,7 @@
         </header>
         <div class="row">
           <div class="-4u 4u 12u$(medium)" style="padding-bottom:20px;">
-            <label for="dbid" style="text-align:left;">Base Directory
+            <label for="basedir" style="text-align:left;">Base Directory
               <input type="text" name="basedir" value="<?php echo $absPath; ?>" />
             </label>
           </div>
@@ -435,7 +433,7 @@
            <input class="button" type="submit" name="submit" value="Continue">
           </div>
         </div>
-        </form>     
+        </form>
       </div>
     </div>
   </div>
@@ -511,7 +509,7 @@
            <input class="button" type="submit" name="submit" value="Continue">
           </div>
         </div>
-        </form>      
+        </form>
       </div>
     </div>
   </div>
@@ -526,7 +524,7 @@
     $gbdir = test_input($_POST["gbdir"]);
 
     $conn = mysqli_connect($servername, $username, $dbpassword, $dbname);
-		
+
     if (!$conn) {
       die("Connection failed: " . mysqli_connect_error());
     }
@@ -601,7 +599,7 @@
 	      <br><br>
 	      <input class="button" type="button" onClick="parent.location='install.php?step=one'" value="Continue">
 	      <br><br>
-	      </span>      
+	      </span>
       </div>
     </div>
   </div>

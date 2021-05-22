@@ -173,7 +173,7 @@ $result = $stmt->get_result();
 if($result->num_rows > 0) {
 
 	while($row = $result->fetch_assoc()) {
-		echo "            <option>".$row["email"]."</option>\n";
+		echo $row["email"]."\n";
 	}
 }
 mysqli_close($conn);
