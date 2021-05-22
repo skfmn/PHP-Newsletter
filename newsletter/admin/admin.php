@@ -77,7 +77,7 @@
 				</ul>
 			</div>
       <div class="-3u 6u$ 12u$(medium)">
-       <iframe id="ifrm" name="ifrm" src="http://www.aspjunction.com/gnews.asp?ref=y&pnl=<?php echo $version; ?>" scrolling="yes" width="100%" height="100" frameborder="1"></iframe>
+      <?php echo file_get_contents("http://www.phpjunction.com/gnews.php?ref=y&pnl=".$version.""); ?>
       </div>
 
     </div>

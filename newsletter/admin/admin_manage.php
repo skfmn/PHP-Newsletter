@@ -33,11 +33,7 @@ if (isset($_SESSION["msg"])) {
 }
 
   $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
-
-  if (!$conn) {
-
-    die("Connection failed: " . mysqli_connect_error());
-  }
+  if (!$conn) {die("Connection failed: " . mysqli_connect_error());}
 
 	$dir = $username = $password = $encrPassword = "";
 
@@ -52,6 +48,7 @@ if (isset($_SESSION["msg"])) {
 		$stmt = $conn->prepare("SELECT * FROM ".DBPREFIX."admin WHERE name = ?");
 		$stmt->bind_param("s", $username);
 		$stmt->execute();
+
 		$result = $stmt->get_result();
     if ($result->num_rows > 0) {
 		  $blnSelect = false;
