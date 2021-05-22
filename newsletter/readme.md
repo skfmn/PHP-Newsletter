@@ -1,4 +1,4 @@
-PHP Newsletter V1                                 
+PHP Newsletter v1.0.1                                
 copyright 2021 Steve Frazier                      
 www.phpjunction.com                               
                                                    
@@ -35,3 +35,9 @@ IMPORTANT NOTES:
    You can set it after installation if you don't know.
 
 3. For a smoother install; Appease the APP gods before installation and sacrifice one iPhone!
+
+Change Log
+2021-05-22
+  1. fixed issue with adding admins on the Admin Manage page.
+  2. Changed the way "News from HTML Junction" is displayed.
+  3. Updated Version number.
