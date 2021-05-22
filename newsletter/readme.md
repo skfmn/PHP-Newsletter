@@ -36,7 +36,8 @@ IMPORTANT NOTES:
 
 3. For a smoother install; Appease the APP gods before installation and sacrifice one iPhone!
 
-Change Log
+Change Log:
+
 2021-05-22
   1. fixed issue with adding admins on the Admin Manage page.
   2. Changed the way "News from HTML Junction" is displayed.
