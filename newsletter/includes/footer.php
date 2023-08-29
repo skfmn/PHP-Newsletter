@@ -1,7 +1,7 @@
-﻿<!-- Footer -->
-  <footer id="footer">
+<!-- Footer -->
+  <footer id="footer" style="position:relative;bottom:0;">
     <div class="copyright">
-      <a href="http://www.aspjunction.com">PHP Newsletter</a> Copyright &copy; 2003 - <?php echo date("Y") ?> <a href="http://www.phpjunction.com">PHP junction</a><br />An <a href="http://www.htmljunction.com">HTML Junction</a> Enterprise. All rights reserved.
+      <a href="http://www.aspjunction.com">PHP Newsletter</a> Copyright &copy; 2003 - <?php echo date("Y") ?> <a href="http://www.phpjunction.com">PHP junction</a>
     </div>
   </footer>
 
@@ -17,6 +17,9 @@
   <script src="../assets/js/skel.min.js"></script>
   <script src="../assets/js/main.js"></script>
   <script src="../assets/js/javascript.js"></script>
+ 
+ <!--<script src="../assets/js/ckeditor.js"></script>
+<script src="../assets/js/script.js"></script>-->
   <script language="javascript" type="text/javascript">
     $(function () {
       var availableTags = [<?php 

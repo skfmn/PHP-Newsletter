@@ -1,144 +1,157 @@
 <?php
-  session_start();
-  ob_start();
-  include '../includes/globals.php';
-  include '../includes/functions.php';
+session_start();
+ob_start();
+include '../includes/globals.php';
+include '../includes/functions.php';
 
-  $cookies = $dir = $username = $password = $encrPassword = $chmsgs = $count = "";
-  $siteTitle = $urlrewrite = $smtpServer = $smtpEmail = $smtpPassword = $smtpDebug = $smtpuse = "";
-  $msg = $chvalue =  "";
+$cookies = $dir = $username = $password = $encrPassword = $chmsgs = $count = "";
+$siteTitle = $urlrewrite = $smtpServer = $smtpEmail = $smtpPassword = $smtpDebug = $smtpuse = "";
+$msg = $chvalue = "";
 
-	$cookies = $_SESSION["nwsadminname"];
+$cookies = $_SESSION["nwsadminname"];
 
-	If ($cookies == "") {
+if ($cookies == "") {
 
-    redirect($redirect."admin/login.php");
+    redirect($redirect . "admin/login.php");
     ob_end_flush();
-  
-	}
 
-  $blnOptions = $_SESSION["blnOptions"];
-	if ($blnOptions == "false") {
-
-    redirect($redirect."admin/admin.php?msg=nar");
-    ob_end_flush();
-  
-	}
-
-if (isset($_SESSION["msg"])) {
-  $msg = $_SESSION["msg"];
-	if ($msg <> "") {
-		displayFancyMsg(getMessage($msg));
-		$_SESSION["msg"] = "";
-  }
 }
 
-  $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
+$blnOptions = $_SESSION["blnOptions"];
+if ($blnOptions == "false") {
 
-  if (!$conn) {
-  
+    $_SESSION["msg"] = "nar";
+    redirect($redirect . "admin/admin.php");
+
+    ob_end_flush();
+
+}
+
+if (isset($_SESSION["msg"])) {
+    $msg = $_SESSION["msg"];
+    if ($msg <> "") {
+        displayFancyMsg(getMessage($msg));
+        $_SESSION["msg"] = "";
+    }
+}
+
+$conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
+
+if (!$conn) {
+
     die("Connection failed: " . mysqli_connect_error());
-  }
-	
-	if (isset($_POST["chmsg"])) {
+}
+
+if (isset($_POST["chmsg"])) {
 
     $chmsgs = "";
-	  $chmsgs = $_POST["messages"];
-    $count = count($chmsgs);	
+    $chmsgs = $_POST["messages"];
+    $count = count($chmsgs);
 
-    foreach($chmsgs as $x => $x_value) {
+    foreach ($chmsgs as $x => $x_value) {
 
-      $param1 = $param2 = "";
-      $param1 = trim($x_value);
-      $param2 = trim($x);
-      $stmt = mysqli_prepare($conn,"UPDATE ".DBPREFIX."messages SET message = ? WHERE msg = ?");
-      $stmt->bind_param('ss', $param1, $param2);
+        $param1 = $param2 = "";
+        $param1 = trim($x_value);
+        $param2 = trim($x);
+        $stmt = mysqli_prepare($conn, "UPDATE " . DBPREFIX . "messages SET message = ? WHERE msg = ?");
+        $stmt->bind_param('ss', $param1, $param2);
 
-		  if ($stmt->execute()) {
-			  $_SESSION["msg"] = "mus";
-      } else {
-        $_SESSION["msg"] = "error";
-      }
+        if ($stmt->execute()) {
+            $_SESSION["msg"] = "mus";
+        } else {
+            $_SESSION["msg"] = "error";
+        }
     }
 
-    redirect($redirect."admin/admin_options.php");
+    redirect($redirect . "admin/admin_options.php");
     ob_end_flush();
-		
-	}
 
-	if (isset($_POST["chumsg"])) {
+}
+
+if (isset($_POST["chumsg"])) {
 
     $chumsgs = "";
-	  $chumsgs = $_POST["usermessages"];
+    $chumsgs = $_POST["usermessages"];
     $count = count($chumsgs);
-    
-    foreach($chumsgs as $x => $x_value) {
 
-      $param1 = $param2 = "";
-      $param1 = trim($x_value);
-      $param2 = trim($x);
-      $stmt = mysqli_prepare($conn,"UPDATE ".DBPREFIX."endMsg SET endMsg = ? WHERE endMsgName = ?");
-      $stmt->bind_param('ss', $param1, $param2);
+    foreach ($chumsgs as $x => $x_value) {
 
-		  if ($stmt->execute()) {
-			  $_SESSION["msg"] = "mus";
-      } else {
-        $_SESSION["msg"] = "error";
-      }
+        $param1 = $param2 = "";
+        $param1 = trim($x_value);
+        $param2 = trim($x);
+        $stmt = mysqli_prepare($conn, "UPDATE " . DBPREFIX . "endMsg SET endMsg = ? WHERE endMsgName = ?");
+        $stmt->bind_param('ss', $param1, $param2);
+
+        if ($stmt->execute()) {
+            $_SESSION["msg"] = "mus";
+        } else {
+            $_SESSION["msg"] = "error";
+        }
     }
 
-    redirect($redirect."admin/admin_options.php");
+    redirect($redirect . "admin/admin_options.php");
     ob_end_flush();
-		
-	}
 
-	if (isset($_POST["chmstgs"])) {
+}
 
- 
-    if (isset($_POST["sitetitle"])) { $siteTitle = test_input($_POST["sitetitle"]); }
-    if (isset($_POST["smtpserver"])) { $smtpServer = test_input($_POST["smtpserver"]); }
-    if (isset($_POST["smtpemail"])) { $smtpEmail = test_input($_POST["smtpemail"]); }
-    if (isset($_POST["smtppassword"])) { $smtpPassword = test_input($_POST["smtppassword"]); }
+if (isset($_POST["chmstgs"])) {
+
+    if (isset($_POST["sitetitle"])) {
+        $siteTitle = test_input($_POST["sitetitle"]);
+    }
+    if (isset($_POST["smtpserver"])) {
+        $smtpServer = test_input($_POST["smtpserver"]);
+    }
+    if (isset($_POST["smtpemail"])) {
+        $smtpEmail = test_input($_POST["smtpemail"]);
+    }
+    if (isset($_POST["smtppassword"])) {
+        $smtpPassword = test_input($_POST["smtppassword"]);
+    }
+
+    if (isset($_POST["smtpport"])) {
+        $smtpPort = test_input($_POST["smtpport"]);
+    }
 
     $urlrewrite = "no";
-    if (isset($_POST["urlrewrite"])) { 
-      $urlrewrite = test_input($_POST["urlrewrite"]);
-      if ($urlrewrite == "on") {
-        $urlrewrite = "yes";
-      }
+    if (isset($_POST["urlrewrite"])) {
+        $urlrewrite = test_input($_POST["urlrewrite"]);
+        if ($urlrewrite == "on") {
+            $urlrewrite = "yes";
+        }
     }
 
     $smtpDebug = "no";
-    if (isset($_POST["smtpdebug"])) { 
-      $smtpDebug = test_input($_POST["smtpdebug"]);
-      if ($smtpDebug == "on") {
-        $smtpDebug = "yes";
-      }
+    if (isset($_POST["smtpdebug"])) {
+        $smtpDebug = test_input($_POST["smtpdebug"]);
+        if ($smtpDebug == "on") {
+            $smtpDebug = "yes";
+        }
     }
 
     $smtpUse = "no";
-    if (isset($_POST["smtpuse"])) { 
-      $smtpUse = test_input($_POST["smtpuse"]);
-      if ($smtpUse == "on") {
-        $smtpUse = "yes";
-      }
+    if (isset($_POST["smtpuse"])) {
+        $smtpUse = test_input($_POST["smtpuse"]);
+        if ($smtpUse == "on") {
+            $smtpUse = "yes";
+        }
     }
 
-    $stmt = mysqli_prepare($conn,"UPDATE ".DBPREFIX."settings SET site_title = ?, smtp_server = ?, email_address = ?, smtp_password = ?, smtpdebug = ?, smtpuse= ?, rewrite = ?");
-    $stmt->bind_param('sssssss', $siteTitle, $smtpServer, $smtpEmail, $smtpPassword, $smtpDebug, $smtpUse, $urlrewrite);
+    $stmt = mysqli_prepare($conn, "UPDATE " . DBPREFIX . "settings SET site_title = ?, smtp_server = ?, email_address = ?, smtp_password = ?, smtpdebug = ?, smtpuse= ?, rewrite = ?, smtpport = ?");
+    $stmt->bind_param('ssssssss', $siteTitle, $smtpServer, $smtpEmail, $smtpPassword, $smtpDebug, $smtpUse, $urlrewrite, $smtpPort);
 
-		if ($stmt->execute()) {
-			$_SESSION["msg"] = "siu";
+    if ($stmt->execute()) {
+        $_SESSION["msg"] = "siu";
     } else {
-      $_SESSION["msg"] = "error";
+        $_SESSION["msg"] = "error";
     }
 
-    redirect($redirect."admin/admin_options.php");
+    redirect($redirect . "admin/admin_options.php");
     ob_end_flush();
 
-	}
+}
 
-  include "../includes/header.php";
+include "../includes/header.php";
 ?>
 <div id="main" class="container">
   <header>
@@ -148,11 +161,11 @@ if (isset($_SESSION["msg"])) {
     <div class="6u 12u$(medium)">
       <h3>Admin Messages</h3>
 <?php
-    $sql = "SELECT * FROM ".DBPREFIX."messages";
-    $result = $conn->query($sql);
+$sql = "SELECT * FROM " . DBPREFIX . "messages";
+$result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-?>    
+if ($result->num_rows > 0) {
+    ?>
       <div class="12u$" style="padding-bottom:10px;">
         <div class="table-wrapper">
           <form action="admin_options.php" method="post">
@@ -160,10 +173,10 @@ if (isset($_SESSION["msg"])) {
           <table>
             <tbody>
 <?php
-      while($row = $result->fetch_assoc()) {
-        $tempMsg = "";
-        $tempMsg = $row["msg"];
-?>
+        while ($row = $result->fetch_assoc()) {
+            $tempMsg = "";
+            $tempMsg = $row["msg"];
+            ?>
               <tr>
                 <td style="width:30%;">
                   <?php echo trim(msgTrans($tempMsg)); ?>
@@ -173,8 +186,8 @@ if (isset($_SESSION["msg"])) {
                 </td>
               </tr>
 <?php
-	    }
-?>
+        }
+        ?>
               <tfoot>
                 <tr>
                   <td colspan="2"><input type=submit value="Save Admin Messages" class="button fit"></td>
@@ -185,17 +198,17 @@ if (isset($_SESSION["msg"])) {
           </form>
         </div>
 <?php
-    }
+}
 ?>
       </div>
       <h3>User Messages</h3>
 <?php
-    
-    $sql = "SELECT * FROM ".DBPREFIX."endMsg";
-    $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-?>    
+$sql = "SELECT * FROM " . DBPREFIX . "endMsg";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    ?>
       <div class="12u$" style="padding-bottom:10px;">
         <div class="table-wrapper">
           <form action="admin_options.php" method="post">
@@ -203,11 +216,11 @@ if (isset($_SESSION["msg"])) {
           <table>
             <tbody>
 <?php
-      while($row = $result->fetch_assoc()) {
-        $tMsg = $tMsgName = "";
-        $tMsg = $row["endMsg"];
-        $tMsgName = $row["endMsgName"];
-?>
+        while ($row = $result->fetch_assoc()) {
+            $tMsg = $tMsgName = "";
+            $tMsg = $row["endMsg"];
+            $tMsgName = $row["endMsgName"];
+            ?>
               <tr>
                 <td style="width:30%;">
                   <?php echo trim(msgTrans($tMsgName)); ?>
@@ -217,8 +230,8 @@ if (isset($_SESSION["msg"])) {
                 </td>
               </tr>
 <?php
-	    }
-?>
+        }
+        ?>
               <tfoot>
                 <tr>
                   <td colspan="2">
@@ -232,30 +245,30 @@ if (isset($_SESSION["msg"])) {
           </form>
         </div>
 <?php
-    }
-    mysqli_close($conn);
+}
+mysqli_close($conn);
 ?>
-      </div>      
+      </div>
 
     </div>
     <div class="6u$ 12u$(medium)">
       <h3>Site Settings</h3>
-<?php 
+<?php
 
-  $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
+$conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
 
-  if (!$conn) {
-  
+if (!$conn) {
+
     die("Connection failed: " . mysqli_connect_error());
-  }
+}
 
-  $siteTitle = $urlrewrite = $smtpServer = $smtpEmail = "";
-  $onoff = $smtpPassword = $smtpPort = $smtpDebug = $smtpUse = ""; 
+$siteTitle = $urlrewrite = $smtpServer = $smtpEmail = "";
+$onoff = $smtpPassword = $smtpPort = $smtpDebug = $smtpUse = "";
 
-  $sql = "SELECT * FROM ".DBPREFIX."settings";
-  $result = $conn->query($sql);
+$sql = "SELECT * FROM " . DBPREFIX . "settings";
+$result = $conn->query($sql);
 
-  if ($result->num_rows > 0) {
+if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
 
     $siteTitle = $row["site_title"];
@@ -268,29 +281,29 @@ if (isset($_SESSION["msg"])) {
     $smtpUse = $row["smtpuse"];
 
     if ($urlrewrite == "yes") {
-      $urlchecked = "checked";
-      $urlonoff = "On";
+        $urlchecked = "checked";
+        $urlonoff = "On";
     } else {
-      $urlchecked = "";
-      $urlonoff = "Off";
+        $urlchecked = "";
+        $urlonoff = "Off";
     }
 
     if ($smtpDebug == "yes") {
-      $debchecked = "checked";
-      $debonoff = "On";
+        $debchecked = "checked";
+        $debonoff = "On";
     } else {
-      $debchecked = "";
-      $debonoff = "Off";
+        $debchecked = "";
+        $debonoff = "Off";
     }
 
     if ($smtpUse == "yes") {
-      $usechecked = "checked";
-      $useonoff = "On";
+        $usechecked = "checked";
+        $useonoff = "On";
     } else {
-      $usechecked = "";
-      $useonoff = "Off";
+        $usechecked = "";
+        $useonoff = "Off";
     }
-?> 
+    ?>
       <div class="row">
         <div class="12u$" style="padding-bottom:10px;">
           <div class="table-wrapper">
@@ -344,10 +357,21 @@ if (isset($_SESSION["msg"])) {
                   <td style="width:70%;">
                     <div class="select-wrapper" style="width:85px;">
                       <select name="smtpport" style="width:80px;">
-                        <option value="25" <?php if ($smtpPort == "25") {echo "selected";} ?>>25</option>
-                        <option value="587" <?php if ($smtpPort == "587") {echo "selected";} ?>>587</option>
-                        <option value="465" <?php if ($smtpPort == "465") {echo "selected";} ?>>465</option>
-                        <option value="2525" <?php if ($smtpPort == "2525") {echo "selected";} ?>>2525</option>
+                        <option value="25" <?php if ($smtpPort == "25") {
+                            echo "selected";
+                        } ?>>25</option>
+                        <option value="80" <?php if ($smtpPort == "80") {
+                            echo "selected";
+                        } ?>>80</option>
+                        <option value="465" <?php if ($smtpPort == "465") {
+                            echo "selected";
+                        } ?>>465</option>
+                        <option value="587" <?php if ($smtpPort == "587") {
+                            echo "selected";
+                        } ?>>587</option>
+                        <option value="2525" <?php if ($smtpPort == "2525") {
+                            echo "selected";
+                        } ?>>2525</option>
                       </select>
                     </div>
                   </td>
@@ -402,8 +426,8 @@ if (isset($_SESSION["msg"])) {
           <pre>
             <code>
 <?php
-       echo htmlentities(
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+        echo htmlentities(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <configuration>
   <system.webServer>
     <rewrite>
@@ -426,37 +450,40 @@ if (isset($_SESSION["msg"])) {
         </rule>
         <rule name=\"Rewrite thankyou to friendly URL\">
           <match url=\"^thankyou\" />
-          <action type=\"Rewrite\" url=\"/newsletter/includes/process.php?thanks=you\" />
+          <action type=\"Rewrite\" url=\"/newsletter/includes/process.php?thank=you\" />
         </rule>
       </rules>
     </rewrite>
   </system.webServer>
 </configuration>"
- )
-?>
+        )
+            ?>
             </code>
           </pre>
           <span><strong>Unix, et al:</strong><br />Create a file called .htaccess add the code below.</span>
           <pre>
             <code>
 <?php
-       echo htmlentities(
-"RewriteEngine on
+        echo htmlentities(
+            "RewriteEngine on
 RewriteRule ^process/([\~\-a-z-]+)/([a-z-]+) /newsletter/includes/process.php?email=$1&amp;mode=$2
 RewriteRule ^remove /newsletter/includes/process.php?mode=cancel
 RewriteRule ^subscribe /newsletter/includes/process.php
-RewriteRule ^unsubscribe /newsletter/includes/process.php
-RewriteRule ^thankyou /newsletter/includes/process.php?thanks=you"
- )
- ?>   
+RewriteRule ^unsubscribe /newsletter/includes/remove.php
+RewriteRule ^thankyou /newsletter/includes/process.php?thank=you"
+        )
+            ?>
             </code>
           </pre>
         </div>
+          <div class="-4u 4u$ 12u$(medium)">
+              <a class="button" target="_blank" href="phpinfo.php">PHP Info</a>
+          </div>
 <?php
-  }
-  mysqli_close($conn);
+}
+mysqli_close($conn);
 ?>
-      </div> 
+      </div>
     </div>
   </div>
 </div>

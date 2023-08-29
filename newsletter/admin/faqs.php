@@ -74,6 +74,14 @@ password=password // SMTP Password
                   </code>
                 </pre>
               </li>
+            <li style="padding-bottom:10px;">
+                You may not have an SPF (Sender Policy Framework) Record set up for your domain name. You should add a TXT record to your DNS Settings so they look something like this (You should be able to get the correct one from you Domain Provider):<br />
+                <pre>
+                    <code>
+v=spf1 include:yourmailserver.com -all
+                    </code>
+                </pre>
+            </li>
               <li style="padding-bottom:10px;">You may be trying to send too many emails at one time. Try sending fewer emails at a time.</li>
               <li>The APP gods are displeased! You must sacrifice three iPhones to appease them!</li>
             </ol>
@@ -81,11 +89,12 @@ password=password // SMTP Password
           </div>
           <h3>What SMTP Port should I use?</h3>
           <div style="text-align:left;">
-            There are four choices:
+            There are five choices:
             <ol>
               <li>25 = Default port. Not secure, Most providers block port 25 for incoming mail. Should only be used as a last option.</li>
-              <li>587 = TLS (Transport layer security) Recommended! Secure, most providers require this port for SMTP.</li>
+              <li>80 = Some providers like GoDaddy require you to use this secure port.</li>
               <li>465 = SSL (Secure Socket Layer) Use this if your mail server uses a SSL.</li>
+              <li>587 = TLS (Transport layer security) Recommended! Secure, most providers require this port for SMTP.</li>
               <li>2525 = Mirror of 587. Use this if port 587 is blocked.</li>
             </ol>
             If none of these work sacrifice five iPhones to the APP gods!

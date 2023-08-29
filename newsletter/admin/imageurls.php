@@ -1,3 +1,17 @@
+<script>
+function selectText(containerid) {
+    if (document.selection) { // IE
+        var range = document.body.createTextRange();
+        range.moveToElementText(document.getElementById(containerid));
+        range.select();
+    } else if (window.getSelection) {
+        var range = document.createRange();
+        range.selectNode(document.getElementById(containerid));
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+    }
+}
+</script>
 <?php
   session_start();
   ob_start();
@@ -11,7 +25,7 @@
 
     redirect($redirect."admin/login.php");
     ob_end_flush();
-  
+
 	}
 
   $dir = $bkcolor = $ext = $file = $dh = "";
@@ -27,10 +41,12 @@
 
     if ($dh = opendir($dir)){
       $counter = 0;
+      echo "<div style=\"min-width:600px\">";
+      echo "   <div style=\"position:relative;display:block;float:left;\">";
       while (($file = readdir($dh)) !== false){
- 
+
         if (!is_dir($file)) {
-          
+
           $ext = pathinfo($file, PATHINFO_EXTENSION);
 
           $arrlength = count($allowExt);
@@ -48,16 +64,19 @@
                 $bkcolor = "#e2effc";
               }
 
-              echo "<span onmouseover=\"document.getElementById('place-holder-1').src='".$http."://".$httpHost.GBDIR."admin/images/".$file."'\";";
-              echo "onmouseout=\"document.getElementById('place-holder-1').src=''\"; style=\"background-color:".$bkcolor.";\">".$http."://".$httpHost.GBDIR."admin/images/".$file."</span>";
-              echo "<img src=\"\" id=\"place-holder-1\" style=\"zindex: 100; position: absolute;\" /><br />";
-
+              echo "<span id=\"img-".$counter."\" onclick=\"selectText('img-" . $counter . "')\" onmouseover=\"document.getElementById('place-holder-1').src='".$http."://".$httpHost.GBDIR."admin/images/".$file."'\";";
+              echo "onmouseout=\"document.getElementById('place-holder-1').src=''\"; style=\"background-color:".$bkcolor.";\">".$http."://".$httpHost.GBDIR."admin/images/".$file."</span><br>";
 
               clearstatcache();
-            }         
+            }
           }
         }
       }
+        echo "   </div>";
+        echo "   <div style=\"position:relative;display:block;float:left;margin-left:10px;\">";
+        echo "      <img src=\"\" id=\"place-holder-1\" />";
+        echo "   </div>";
+        echo "<div>";
       closedir($dh);
     }
   }

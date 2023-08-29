@@ -1,4 +1,4 @@
-﻿<!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html>
 <head>
 <title>PHP Newsletter - Version 1.0</title>
@@ -8,7 +8,7 @@
 <link type="text/css" rel="stylesheet" href="../assets/css/jquery-ui.structure.css" />
 <link type="text/css" rel="stylesheet" href="../assets/css/jquery.fancybox.css" />
 <link type="text/css" rel="stylesheet" href="../assets/css/main.css" />
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+<!--<link type="text/css" rel="stylesheet" href="../assets/css/styles.css" />-->
 </head>
 
 <body id="top">
