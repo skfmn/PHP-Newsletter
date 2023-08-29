@@ -16,5 +16,5 @@ if ($_SERVER["HTTPS"] == "off") {
 $httpHost = $_SERVER["HTTP_HOST"];
 $redirect = $http . "://" . $httpHost . GBDIR;
 
-$version = "1.0";
+$version = "1.2.1";
 ?>
