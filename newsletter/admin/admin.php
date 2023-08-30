@@ -23,7 +23,7 @@ if (isset($_SESSION["msg"])) {
 }
 
 $baseDir = BASEDIR;
-$baseDir = str_replace("\\\\", "\\", $baseDir . "newsleeter\\install\\");
+$baseDir = str_replace("\\\\", "\\", $baseDir . "newsletter\\install\\");
 $dir = $baseDir;
 if (is_dir($dir)) {
     deleteDir($dir);
