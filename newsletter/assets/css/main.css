@@ -2888,22 +2888,20 @@ iframe#myframe {
 				}
 
 		}
-		/* Other Stuff */
-	div.input-wrapper {
-		float: left;
-		position: relative;
-		display: inline-block;
-		width: 100%;
-		height: 2.75em;
-	}
+/* Other Stuff */
+div.input-wrapper {
+	float: left;
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
 
-	i.shpwd {
-		float: right;
-		position: absolute;
-		display: inline-block;
-		top: 0px;
-		right: 0px;
-		margin-right: 6px;
-		margin-top: 15px;
-		z-index: 2;
-	}
+i.shpwd {
+	float: right;
+	position: absolute;
+	display: inline-block;
+	font-size: 30px;
+	top: 10px;
+	right: 10px;
+	z-index: 2;
+}
