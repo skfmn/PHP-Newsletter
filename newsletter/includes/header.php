@@ -8,7 +8,7 @@
 <link type="text/css" rel="stylesheet" href="../assets/css/jquery-ui.structure.css" />
 <link type="text/css" rel="stylesheet" href="../assets/css/jquery.fancybox.css" />
 <link type="text/css" rel="stylesheet" href="../assets/css/main.css" />
-<!--<link type="text/css" rel="stylesheet" href="../assets/css/styles.css" />-->
+<script type="text/javascript" src="../ckeditor/ckeditor.js"></script>
 </head>
 
 <body id="top">
@@ -31,4 +31,7 @@
 		<li><a href="admin_manage.php">Manage Admins</a></li>
 		<li><a href="faqs.php">FAQS</a></li>
 		</ul>
+        <ul class="actions vertical">
+            <li><a class="button" target="_blank" href="phpinfo.php">PHP Info</a></li>
+        </ul>
 	</nav>

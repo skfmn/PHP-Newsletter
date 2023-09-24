@@ -113,7 +113,7 @@ include "../includes/header.php";
 <script src="//cdn.ckeditor.com/4.6.2/full/ckeditor.js"></script>
 <div id="main" class="container">
     <header>
-        <h2>Send a Newsletter</h2>
+        <h2 style="text-align:center;">Send a Newsletter</h2>
     </header>
     <?php
     $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
@@ -143,17 +143,12 @@ include "../includes/header.php";
             $subject = test_input($_POST["subject"]);
         }
 
-        if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['error'] == UPLOAD_ERR_OK) {
+        if (isset($_POST['selectattach']) && $_POST["selectattach"] !== "")  {
 
-            $ext = pathinfo($_FILES['userfile']['name'], PATHINFO_EXTENSION);
-            $uploadfile = tempnam(sys_get_temp_dir(), hash('sha256', $_FILES['userfile']['name'])) . '.' . $ext;
+            $baseDir = BASEDIR;
+            $dir = str_replace("\\\\", "\\", $baseDir . "newsletter\\admin\\attachs\\");
 
-            if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-                $attachment = $_FILES;
-            } else {
-                echo 'Failed to move file ' . $_FILES['userfile']['name'] . ' to file ' . $uploadfile . "\n\r";
-                return false;
-            }
+            $attachment = $dir. $_POST['selectattach'];
 
         }
 
@@ -163,12 +158,16 @@ include "../includes/header.php";
             while ($row = $result->fetch_assoc()) {
 
                 foreach ($semails as $x => $value) {
-
+                    $token = $row["token"];
                     if ($value == $row["email"]) {
                         $emailMsg = "";
                         $sendas = "html";
                         $email = $row["email"];
                         $emailMsg = $_POST["tempbody"];
+                        $emailMsg = str_replace("#YEAR#",date("Y"),$emailMsg);
+                        $emailMsg = str_replace("#SITETITLE#", SITETITLE, $emailMsg);
+                        $emailMsg = str_replace("#CANCELREWRITE#", "<a href=\"" . $http . "://" . $domain . "/cancel/" . $token . "/yes/\">Unsubscribe</a>", $emailMsg);
+                        $emailMsg = str_replace("#CANCELNOREWRITE#", "<a href=\"" . $http . "://" . $domain . NEWSDIR . "includes/process.php?token=" . $token . "&cancel=yes\">Unsubscribe</a>", $emailMsg);
                         $emailMsg = wordwrap($emailMsg, 70);
 
                         if (isset($_POST["sendtxt"])) {
@@ -188,33 +187,48 @@ include "../includes/header.php";
         echo "</div>\n";
     }
 
-    $sql = "SELECT * FROM " . DBPREFIX . "newsletter WHERE news_save = 'draft' OR news_save = 'both'";
+    $sql = "SELECT * FROM " . DBPREFIX . "newsletter WHERE news_save = 'draft'";
     $result = $conn->query($sql);
     if ($result->num_rows > 0) {
         $intDCount = mysqli_num_rows($result);
     }
 
-    $sql = "SELECT * FROM " . DBPREFIX . "newsletter WHERE news_save = 'template' OR news_save = 'both'";
+    $sql = "SELECT * FROM " . DBPREFIX . "newsletter WHERE news_save = 'template'";
     $result = $conn->query($sql);
     if ($result->num_rows > 0) {
         $intTCount = mysqli_num_rows($result);
     }
-
     ?>
-
     <div class="row uniform">
-        <div class="-3u 6u$ 12u$(medium)">
-            <span>
-                You have <?php echo $intDCount; ?> Drafts and <?php echo $intTCount; ?> Templates. <a class="urlimg fancybox.ajax" href="imageurls.php">Get Image URLs</a>
-            </span>
+        <div class="-1u 5u 12u$(medium)">
+            <h5>You have <?php echo $intDCount; ?> Drafts and <?php echo $intTCount; ?> Templates.</h5>
+            <div class="row">
+                <div class="12u$">
+                    <a class="urlimg button fit fancybox.ajax" href="imageurls.php">Get Image URLs</a>
+                </div>
+            </div>
         </div>
-        <div class="-2u 4u 12u$(medium)">
+        <div class="5u$ 12u$(medium)">
+            <form action="uploadattach.php?dla=no&p=s" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="pfrom" value="send" />
+                <h5>Upload Attachment</h5>
+                <div class="row">
+                    <div class="8u 12u$(medium)">
+                        <input class="button" type="file" name="attachs[]" size="20" multiple />
+                    </div>
+                    <div class="4u$ 12u$(medium)">
+                        <input type="submit" name="submit" value="Upload" class="button fit" />
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="-1u 5u 12u$(medium)">
             <label for="loadtemp">Template Title</label>
             <div class="select-wrapper">
                 <?php selectLoadTemplate(); ?>
             </div>
         </div>
-        <div class="4u$ 12u$(medium)">
+        <div class="5u$ 12u$(medium)">
             <label for="tempdescr">Template Description</label>
             <input type="text" id="tempdescr" name="tempdescr" value="" size="30" required />
         </div>
@@ -231,13 +245,7 @@ include "../includes/header.php";
                 <div class="12u  12u$(small)">
                     <textarea name="tempbody" id="tempbody" cols="65" rows="25" wrap="soft"></textarea>
                     <script>
-                        CKEDITOR.filter.allowedContentRules = true;
-                        CKEDITOR.config.format_tags = 'p;h1;h2;h3;h4;h5;h6;pre;address;div';
-                        CKEDITOR.config.enterMode = CKEDITOR.ENTER_BR;
-                        CKEDITOR.config.removeButtons = 'Templates,Save,Print,Flash,NewPage';
-                        CKEDITOR.replace( 'tempbody', {
-                          extraAllowedContent: 'header; content; footer; section; article'
-                        });
+                          CKEDITOR.replace( 'tempbody');
                     </script>
                 </div>
 
@@ -254,7 +262,6 @@ include "../includes/header.php";
                                     $counter = $counter + 1;
                                     $email = $row["email"];
                                     echo "                <option value=\"" . $email . "\">" . $counter . ". " . $email . "</option>\n";
-
                                 }
                             }
                             mysqli_close($conn);
@@ -264,9 +271,28 @@ include "../includes/header.php";
                     <div class="3u 12u$(small)">
                         <input type="button" class="button fit" value="Select All Emails" onclick="selectAll('semail');" />
                     </div>
-                    <div class="5u$ 12u$(small)" style="text-align:center;">
-                        <input type="file" id="userfile" name="userfile" class="button fit" />
-                        <label for="userfile">Add Attachment</label>
+                    <div class="5u$ 12u$(medium)">
+						<div class="select-wrapper">
+							<select name="selectattach" id="selectattach">
+<?php
+    $baseDir = BASEDIR;
+    $dir = str_replace("\\\\", "\\", $baseDir . "newsletter\\admin\\attachs\\");
+    if (is_dir($dir)) {
+        if ($dh = opendir($dir)) {
+            echo "<option value=\"\">Select Attachment</option>";
+            while (($file = readdir($dh)) !== false) {
+                if ($file == '.' or $file == '..') continue;
+                echo "<option value=". $file .">" . $file . "</option>";
+            }
+            closedir($dh);
+        } else{
+            echo "<option value=\"\">No Attachments</option>";
+        }
+    }
+ ?>
+							</select>
+							<label for="selectattach">Add Attachment</label>
+						</div>
                     </div>
                     <div class="6u 12u$(small)" style="text-align:center;">
                         <input type="submit" name="sendhtml" class="button fit" value="Send as HTML" />

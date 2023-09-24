@@ -48,15 +48,15 @@ include "../includes/header.php";
     <div class="row">
         <div class="-2u 8u 12u(medium)">
             <form action="upload.php?deleteimg=yes" method="post">
-                <h4>Images</h4>
+                <h4>Manage Images</h4>
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
-                                <th>&nbsp;</th>
+                                <th style="width:20px;">&nbsp;</th>
                                 <th>Image</th>
                                 <th>Size</th>
-                                <th>Delete</th>
+                                <th style="text-align:right;">Delete</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,20 +87,10 @@ include "../includes/header.php";
                                             }
                                             ?>
                                             <tr>
-                                                <td>
-                                                    <?php echo $counter; ?>.
-                                                </td>
-                                                <td>
-                                                    <a class="picimg" href="<?php echo $http . "://" . $httpHost . GBDIR; ?>admin/images/<?php echo $file; ?>">
-                                                        <?php echo $file; ?>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <span style="font-size:12px">
-                                                        <?php echo formatSizeUnits(filesize($dir . "\\" . $file)); ?>
-                                                    </span>
-                                                </td>
-                                                <td>
+                                                <td><?php echo $counter; ?>.</td>
+                                                <td style="text-align:left;"><a class="picimg" href="<?php echo $http . "://" . $httpHost . NEWSDIR; ?>admin/images/<?php echo $file; ?>"><?php echo $file; ?></a></td>
+                                                <td><span style="font-size:16px"><?php echo formatSizeUnits(filesize($dir . "\\" . $file)); ?></span></td>
+                                                <td style="text-align:right;">
                                                     <input type="checkbox" id="file<?php echo $counter; ?>" name="file<?php echo $counter; ?>" value="<?php echo $file; ?>" style="z-index:1000" />
                                                     <label for="file<?php echo $counter; ?>">Yes</label>
                                                 </td>
@@ -131,7 +121,7 @@ include "../includes/header.php";
         <div class="-2u 8u 12u(medium)">
             <h4>Upload Files</h4>
             <form name="upldfile" action="upload.php" method="post" enctype="multipart/form-data">
-                <input type="file" name="images[]" size="20" multiple />
+                <input class="button" type="file" name="images[]" size="20" multiple />
                 <input type="submit" value="Upload" />
             </form>
         </div>

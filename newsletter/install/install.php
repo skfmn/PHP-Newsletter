@@ -29,7 +29,7 @@ function test_inputA($data)
 $step = "";
 $step = isset($_GET["step"]) ? $_GET['step'] : "";
 
-$servname = $username = $dbpassword = $dbname = $dbprefix = $basedir = $gbdir = "";
+$servname = $username = $dbpassword = $dbname = $dbprefix = $basedir = $newsdir = "";
 $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = $param9 = "";
 ?>
 <!DOCTYPE HTML>
@@ -146,18 +146,18 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
                         echo "Creating Admin table...<br />";
 
                         $sql = "CREATE TABLE IF NOT EXISTS " . $dbprefix . "admin (
-            adminID int(11) NOT NULL AUTO_INCREMENT ,
-	          name VARCHAR(255) NOT NULL ,
-	          pwd VARCHAR(255) NOT NULL ,
-            send VARCHAR(5) DEFAULT NULL ,
-            addresses VARCHAR(5) DEFAULT NULL ,
-            images VARCHAR(5) DEFAULT NULL ,
-            templates VARCHAR(5) DEFAULT NULL ,
-            options VARCHAR(5) DEFAULT NULL ,
-            admins_rights VARCHAR(5) DEFAULT NULL ,
-            arights  VARCHAR(5) DEFAULT NULL ,
-            PRIMARY KEY (adminID)
-            ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+                        adminID int(11) NOT NULL AUTO_INCREMENT ,
+                        name VARCHAR(255) NOT NULL ,
+                        pwd VARCHAR(255) NOT NULL ,
+                        send VARCHAR(5) DEFAULT NULL ,
+                        addresses VARCHAR(5) DEFAULT NULL ,
+                        images VARCHAR(5) DEFAULT NULL ,
+                        templates VARCHAR(5) DEFAULT NULL ,
+                        options VARCHAR(5) DEFAULT NULL ,
+                        admins_rights VARCHAR(5) DEFAULT NULL ,
+                        arights  VARCHAR(5) DEFAULT NULL ,
+                        PRIMARY KEY (adminID)
+                        ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
 
                         if ($conn->query($sql)) {
                             echo "Admin table created successfully<br />";
@@ -167,9 +167,9 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
 
                         echo "Populating admin table...<br />";
 
-                        $tempPassword = password_hash("admin", PASSWORD_DEFAULT);
+                        $tempPassword = password_hash("Admin", PASSWORD_DEFAULT);
 
-                        $param1 = "admin";
+                        $param1 = "Admin";
                         $param2 = "true";
                         $stmt = $conn->prepare("INSERT INTO " . $dbprefix . "admin (name,pwd,send,addresses,images,templates,options,admins_rights,arights) VALUES (?,?,?,?,?,?,?,?,?)");
                         $stmt->bind_param('sssssssss', $param1, $tempPassword, $param2, $param2, $param2, $param2, $param2, $param2, $param2);
@@ -193,6 +193,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
                                 smtpdebug varchar(10) NOT NULL,
                                 smtpuse varchar(10) NOT NULL,
                                 rewrite varchar(10) NOT NULL,
+                                confirm_email varchar(3000) NOT NULL,
                                 PRIMARY KEY (settingID)
                                 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
 
@@ -222,8 +223,8 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
                         $sql = "INSERT INTO " . $dbprefix . "messages (msg, message) VALUES
                                 ('ds', 'The delete action was successful!'),
                                 ('nea', 'You forgot to enter an email address!'),
-                                ('uls', 'Image(s) uploaded successfully!'),
-                                ('ids', 'Image(s) deleted successfully!'),
+                                ('uls', 'File(s) uploaded successfully!'),
+                                ('ids', 'File(s) deleted successfully!'),
                                 ('nadmin', 'You can not change Admins info.'),
                                 ('del', 'Template deleted!'),
                                 ('das', 'You successfully deleted the Admin.'),
@@ -258,6 +259,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
 	                            email VARCHAR(50) DEFAULT NULL,
                                 datDate VARCHAR(50) DEFAULT NULL,
                                 confirm VARCHAR(50) DEFAULT NULL,
+                                token VARCHAR(15) DEFAULT NULL,
                                 PRIMARY KEY (`NewsID`)
                                 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
 
@@ -287,8 +289,8 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
                         echo "Populating Newsletter table...<br />";
 
                         $sql = "INSERT INTO " . $dbprefix . "newsletter (news_title, news_save, news_description, news_body) VALUES
-                                ('Template One', 'template', 'A simple starting point!', '&lt;header&gt;\r\n&lt;h2 style=&quot;text-align:center&quot;&gt;Template One&lt;/h2&gt;\r\n&lt;/header&gt;\r\n&lt;content&gt;\r\n&lt;div style=&quot;text-align:center&quot;&gt;\r\n&lt;article&gt;&lt;span style=&quot;font-size:16px&quot;&gt;Hello World!&lt;/span&gt;&lt;/article&gt;\r\n&lt;/div&gt;\r\n&lt;/content&gt;\r\n\r\n&lt;footer&gt;\r\n&lt;div style=&quot;text-align:center&quot;&gt;&amp;copy; 2021 All Rights Reserved&lt;/div&gt;\r\n&lt;/footer&gt;\r\n'),
-                                ('Template Two', 'template', 'Another simple starting point!', '&lt;h2&gt;Template Two&lt;/h2&gt;\r\n\r\n&lt;table border=&quot;0&quot; cellpadding=&quot;1&quot; cellspacing=&quot;1&quot; style=&quot;width:500px&quot;&gt;\r\n	&lt;tbody&gt;\r\n		&lt;tr&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n		&lt;/tr&gt;\r\n		&lt;tr&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n		&lt;/tr&gt;\r\n		&lt;tr&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n			&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n		&lt;/tr&gt;\r\n	&lt;/tbody&gt;\r\n&lt;/table&gt;\r\n'),
+                                ('Template One', 'template', 'A simple starting point!', '&lt;html&gt;&lt;head&gt;&lt;title&gt;&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h2&gt;Template One&lt;/h2&gt;&lt;div style=&quot;text-align:center&quot;&gt;&lt;span style=&quot;font-size:16px&quot;&gt;Hello World!&lt;br /&gt;&lt;br /&gt;Cancel subscription #CANCELREWRITE#&lt;/span&gt;&lt;/div&gt;&amp;nbsp;&lt;div style=&quot;text-align:center&quot;&gt;&amp;copy; #YEAR# #SITETITLE# All Rights Reserved&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;'),
+                                ('Template Two', 'template', 'Another simple starting point!', '&lt;h2&gt;Template Two&lt;/h2&gt;\r\n\r\n&lt;table border=&quot;0&quot; cellpadding=&quot;1&quot; cellspacing=&quot;1&quot; style=&quot;width:500px&quot;&gt;\r\n	&lt;tbody&gt;\r\n	&lt;tr&gt;\r\n&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n&lt;/tr&gt;\r\n&lt;tr&gt;\r\n&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n&lt;/tr&gt;\r\n&lt;tr&gt;\r\n&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n&lt;td&gt;&amp;nbsp;&lt;/td&gt;\r\n&lt;/tr&gt;\r\n	&lt;/tbody&gt;\r\n&lt;/table&gt;\r\n'),
                                 ('Draft One', 'draft', 'A Rough Draft!', '&lt;h1&gt;This is an unfinished Draft!&lt;/h1&gt;\r\n&lt;span style=&quot;font-size:16px&quot;&gt;&lt;span style=&quot;font-family:Comic Sans MS~cursive&quot;&gt;&lt;span style=&quot;color:#1abc9c&quot;&gt;Finish it as you like!&lt;/span&gt;&lt;br /&gt;\r\n&lt;span style=&quot;color:#f1c40f&quot;&gt;Finish it as you like!&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;'),
                                 ('Draft Two', 'draft', 'Another Rough Draft', '&lt;h1&gt;This is another Rough Draft!&lt;/h1&gt;\r\n')";
 
@@ -316,15 +318,15 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
                         echo "Populating End Messages table...<br />";
 
                         $sql = "INSERT INTO " . $dbprefix . "endMsg (endMsgName, endMsg) VALUES
-                                ('thanks', '<h2>Thank you!</h2>\r\n#email# was added to our list<br />A confirmation email was sent please follow the instructions in it.<br />Be sure to check your Junk/Spam folder.'),
-                                ('confirmed', '<h2>Success!</h2><br />#email# has been confirmed.<br /><br />Thank you for subscribing to the #sitetitle# newsletter.'),
-                                ('confirmerr', '<h2>We''re Sorry</h2><br />There was a problem and we could not confirm #email#<br />Please try again or contact support.'),
-                                ('alreadysubbed', '<h2>OOPS!</h2><br />It seems that #email# is already subscribed!<br />While we appreciate your enthusiasm you can only subscribe once!'),
-                                ('thankserr', '<h2>Sorry?</h2><br />We were able to add #email# to our list. But could not send the confirmation email.<br />Please contact support!'),
-                                ('adderr', '<h2>Sorry!</h2><br />There was a problem and we could not add #email# to our list.<br />Please try again or contact support.'),
-                                ('notfound', '<h2>Sorry!</h2><br />We could not find #email# in our database.<br />Please contact support.'),
-                                ('removed', '<h2>Success!</h2>#email# has been removed from our list.<br />We are sorry to see you go!'),
-                                ('removederr', '<h2>Sorry!</h2>There was a problem and we could not remove #email# from our list.<br />Please contact support!')";
+                                ('thanks', '<h2>Thank you!</h2><br />#EMAIL# was added to our list<br />A confirmation email was sent please follow the instructions in it.<br />Be sure to check your Junk/Spam folder.'),
+                                ('confirmed', '<h2>Success!</h2><br />#EMAIL# has been confirmed.<br /><br />Thank you for subscribing to the #SITETITLE# newsletter.'),
+                                ('confirmerr', '<h2>We''re Sorry</h2><br />There was a problem and we could not confirm #EMAIL#<br />Please try again or contact support.'),
+                                ('alreadysubbed', '<h2>OOPS!</h2><br />It seems that #EMAIL# is already subscribed!<br />While we appreciate your enthusiasm you can only subscribe once!'),
+                                ('thankserr', '<h2>Sorry?</h2><br />We were able to add #EMAIL# to our list. But could not send the confirmation email.<br />Please contact support!'),
+                                ('adderr', '<h2>Sorry!</h2><br />There was a problem and we could not add #EMAIL# to our list.<br />Please try again or contact support.'),
+                                ('notfound', '<h2>Sorry!</h2><br />We could not find #EMAIL# in our database.<br />Please contact support.'),
+                                ('removed', '<h2>Success!</h2>#EMAIL#has been removed from our list.<br />We are sorry to see you go!'),
+                                ('removederr', '<h2>Sorry!</h2>There was a problem and we could not remove #EMAIL# from our list.<br />Please contact support!')";
 
                         if ($conn->query($sql)) {
                             echo "End Messages  table populated successfully<br /><br />";
@@ -395,9 +397,9 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
                                     </div>
 
                                     <div class="-4u 4u 12u$(medium)" style="padding-bottom:20px;">
-                                        <label for="dir" style="text-align:left;">
+                                        <label for="newsdir" style="text-align:left;">
                                             PHP Newsletter Directory
-                                            <input type="text" name="gbdir" value="/newsletter/" size="40" />
+                                            <input type="text" id="newsdir" name="newsdir" value="/newsletter/" size="40" />
                                         </label>
                                     </div>
                                     <div class="4u 1u$">
@@ -422,7 +424,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
         $dbname = test_input($_POST["dbname"]);
         $dbprefix = test_input($_POST["dbprefix"]);
         $basedir = test_inputA($_POST["basedir"]);
-        $gbdir = test_input($_POST["gbdir"]);
+        $newsdir = test_input($_POST["newsdir"]);
 
         $basedir = preg_replace("/([\\\])/", '${1}${1}', $basedir);
 
@@ -438,7 +440,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
         $fileA = str_replace("{#dbname#}", $dbname, $fileA);
         $fileA = str_replace("{#dbprefix#}", $dbprefix, $fileA);
         $fileA = str_replace("{#basedir#}", $basedir, $fileA);
-        $fileA = str_replace("{#gbdir#}", $gbdir, $fileA);
+        $fileA = str_replace("{#newsdir#}", $newsdir, $fileA);
 
         fwrite($file, $fileA);
 
@@ -454,7 +456,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
                                     <input type="hidden" name="username" value="<?php echo $username; ?>" />
                                     <input type="hidden" name="dbpassword" value="<?php echo $dbpassword; ?>" />
                                     <input type="hidden" name="dbprefix" value="<?php echo $dbprefix; ?>" />
-                                    <input type="hidden" name="gbdir" value="<?php echo $gbdir; ?>" />
+                                    <input type="hidden" name="newsdir" value="<?php echo $newsdir; ?>" />
                                     <header>
                                         <h3>
                                             <span class="first">
@@ -481,7 +483,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
         $dbpassword = test_input($_POST["dbpassword"]);
         $dbname = test_input($_POST["dbname"]);
         $dbprefix = test_input($_POST["dbprefix"]);
-        $gbdir = test_input($_POST["gbdir"]);
+        $newsdir = test_input($_POST["newsdir"]);
         ?>
                         <div id="main" class="container" style="margin-top:-100px;">
                             <div class="row">
@@ -492,7 +494,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
                                         <input type="hidden" name="username" value="<?php echo $username; ?>" />
                                         <input type="hidden" name="dbpassword" value="<?php echo $dbpassword; ?>" />
                                         <input type="hidden" name="dbprefix" value="<?php echo $dbprefix; ?>" />
-                                        <input type="hidden" name="gbdir" value="<?php echo $gbdir; ?>" />
+                                        <input type="hidden" name="newsdir" value="<?php echo $newsdir; ?>" />
                                         <header>
                                             <h2>Settings</h2>
                                         </header>
@@ -530,7 +532,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
 
                                             <div class="-4u 4u 12u$(medium)" style="padding-bottom:20px;">
                                                 <label for="smtpport" style="text-align:left;">
-                                                    SMTP Server <span style="font-size:12px;">(If your not sure leave it as is)</span>
+                                                    SMTP Port <span style="font-size:12px;">(If your not sure leave it as is)</span>
                                                     <input type="text" name="smtpport" value="587" />
                                                 </label>
                                             </div>
@@ -566,7 +568,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
                                 </div>
                             </div>
                         </div>
-                        <?php
+    <?php
     } else if ($step == "six") {
 
         $servername = test_input($_POST["servername"]);
@@ -574,7 +576,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
         $dbpassword = test_input($_POST["dbpassword"]);
         $dbname = test_input($_POST["dbname"]);
         $dbprefix = test_input($_POST["dbprefix"]);
-        $gbdir = test_input($_POST["gbdir"]);
+        $newsdir = test_input($_POST["newsdir"]);
 
         $conn = mysqli_connect($servername, $username, $dbpassword, $dbname);
 
@@ -591,9 +593,10 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
         $param7 = "no";
         $param8 = "yes";
         $param9 = "no";
+        $param10 = "<html><head><title>Confirmation Email</title></head><body><p>Thank you&nbsp;#EMAIL# for subscribing to the #SITETITLE# Newsletter<br /><br />Please confirm your subscription by tapping/clicking on the link below.<br /><br />#CONFIRMREWRITE#<br /><br />You received this email because someone&nbsp;submitted this email address to our mailing list.<br />If you did not subscribe or wish to be removed from our list - tap/click on the link below<br /><br />#CANCELREWRITE#<br /><br />Our Thanks<br />#SITETITLE#</p><p style=\"text-align:center\"><span style=\"font-size:12px\">#CR# Copyright #YEAR# #SITETITLE# |&nbsp;<a href=\"/privacy/\" target=\"_blank\">Privacy Policy</a></span></p></body></html>";
 
-        $stmt = $conn->prepare("INSERT INTO " . $dbprefix . "settings (site_title, domain_name, smtp_server, smtpport, email_address, smtp_password, smtpdebug, smtpuse, rewrite) VALUES (?,?,?,?,?,?,?,?,?)");
-        $stmt->bind_param("sssssssss", $param1, $param2, $param3, $param4, $param5, $param6, $param7, $param8, $param9);
+        $stmt = $conn->prepare("INSERT INTO " . $dbprefix . "settings (site_title, domain_name, smtp_server, smtpport, email_address, smtp_password, smtpdebug, smtpuse, rewrite, confirm_email) VALUES (?,?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("ssssssssss", $param1, $param2, $param3, $param4, $param5, $param6, $param7, $param8, $param9, $param10);
 
         if ($stmt->execute() === TRUE) {
 
@@ -604,7 +607,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
             }
 
             $httpHost = $_SERVER["HTTP_HOST"];
-            $redirect = $http . "://" . $httpHost . $gbdir;
+            $redirect = $http . "://" . $httpHost . $newsdir;
             redirect($redirect . "install/install.php?step=done");
             ob_end_flush();
 
@@ -612,7 +615,7 @@ $param1 = $param2 = $param3 = $param4 = $param5 = $param6 = $param7 = $param8 = 
         $conn->close();
 
     } else if ($step == "done") {
-        ?>
+    ?>
                                 <div id="main" class="container">
                                     <div class="row">
                                         <div class="12u 12u$(medium)" style="text-align:center;">

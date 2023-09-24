@@ -136,38 +136,36 @@ if (isset($_GET["p"])) {
 
 include "../includes/header.php";
 
+$conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+$param1 = "yes";
+$stmt = $conn->prepare("SELECT * FROM " . DBPREFIX . "addresses WHERE confirm  = ?");
+$stmt->bind_param("s", $param1);
+$stmt->execute();
+$result = $stmt->get_result();
+$count = 0;
+if ($result->num_rows > 0) {
+
+    while ($row = $result->fetch_assoc()) {
+        $count = mysqli_num_rows($result);
+    }
+
+}
+mysqli_close($conn);
+
 ?>
 <div id="main" class="container">
     <header>
         <h2>Manage Addresses</h2>
     </header>
     <div class="row">
-        <?php
-        $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
-        if (!$conn) {
-            die("Connection failed: " . mysqli_connect_error());
-        }
-        $param1 = "yes";
-        $stmt = $conn->prepare("SELECT * FROM " . DBPREFIX . "addresses WHERE confirm  = ?");
-        $stmt->bind_param("s", $param1);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $count = 0;
-        if ($result->num_rows > 0) {
-
-            while ($row = $result->fetch_assoc()) {
-                $count = mysqli_num_rows($result);
-            }
-
-        }
-        mysqli_close($conn);
-
-        ?>
         <div class="6u 12u$(medium)">
             <div class="12u$" style="padding-bottom:10px;">
                 <label for="viewemail">View Addresses in Your List</label>
-                <textarea rows="2">
-                    <?php
+                <textarea rows="2" style="text-align:left;">
+<?php
                     $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
                     if (!$conn) {
                         die("Connection failed: " . mysqli_connect_error());
@@ -180,12 +178,11 @@ include "../includes/header.php";
                     if ($result->num_rows > 0) {
 
                         while ($row = $result->fetch_assoc()) {
-                            echo $row["email"] . "\n";
+                            echo trim($row["email"]) . "\n";
                         }
                     }
                     mysqli_close($conn);
-
-                    ?>
+?>
                 </textarea>
             </div>
             <div class="12u$" style="padding-bottom:10px;">

@@ -1,17 +1,17 @@
 <?php
-	ob_start();
-	require("../PHPMailer/src/PHPMailer.php");
-  require("../PHPMailer/src/SMTP.php");
-  require("../PHPMailer/src/Exception.php");
-	include "globals.php"; 
-	include "functions.php";
+ob_start();
+require("../PHPMailer/src/PHPMailer.php");
+require("../PHPMailer/src/SMTP.php");
+require("../PHPMailer/src/Exception.php");
+include "globals.php";
+include "functions.php";
 $msg = "";
 if (isset($_SESSION["msg"])) {
-  $msg = $_SESSION["msg"];
-	if ($msg <> "") {
-		displayFancyMsg(getMessage($msg));
-		$_SESSION["msg"] = "";
-  }
+    $msg = $_SESSION["msg"];
+    if ($msg <> "") {
+        displayFancyMsg(getMessage($msg));
+        $_SESSION["msg"] = "";
+    }
 }
 
 ?>
@@ -21,177 +21,223 @@ if (isset($_SESSION["msg"])) {
   <title>PHP Newsletter - Version 1.0</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> 
-  <link type="text/css" rel="stylesheet" href="<?php echo $http."://".$httpHost.GBDIR;  ?>/assets/css/jquery.fancybox.css" />
-  <link type="text/css" rel="stylesheet" href="<?php echo $http."://".$httpHost.GBDIR;  ?>/assets/css/main.css" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link type="text/css" rel="stylesheet" href="<?php echo $http . "://" . $httpHost . NEWSDIR; ?>/assets/css/jquery.fancybox.css" />
+  <link type="text/css" rel="stylesheet" href="<?php echo $http . "://" . $httpHost . NEWSDIR; ?>/assets/css/main.css" />
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 </head>
 
 <body>
   <div id="main" class="container">
-<?PHP
+<?php
+$email = $confirm = $response = $param1 = $cancel = "";
+$msg = $subject = $emailMsg = $headers = $error = $nemail = "";
+$blnmsgsent = false;
 
-	$email = $confirm = $response = $param1 = $cancel = "";
-	$msg = $subject = $emailMsg = $headers = $error = $nemail = "";
-	$blnmsgsent = false;
+$conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
 
-  $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 
-	if (!$conn) {
-		die("Connection failed: " . mysqli_connect_error());
-	}
+if ((isset($_POST["email"]))) {
+    $email = test_input($_POST["email"]);
+    $email = trim($email);
+} else if ((isset($_GET["email"]))) {
+    $email = test_input($_GET["email"]);
+    $email = str_replace("~", "@", $email);
+    $email = str_replace("-", ".", $email);
+    $email = trim($email);
+}
 
-	if ((isset($_POST["email"]))) { 
-	  $email = test_input($_POST["email"]);
-		$email = trim($email);
-	} else if ((isset($_GET["email"]))) {
-	  $email = test_input($_GET["email"]);
-		$email = str_replace("~","@",$email);
-		$email = str_replace("-",".",$email);
-		$email = trim($email);
-	}
+if ((isset($_GET["mode"]))) {
+    $mode = test_input($_GET["mode"]);
+    if ($mode == "confirm") {
+        $confirm = "yes";
+    } else if ($mode == "cancel") {
+        $cancel = "yes";
+    }
+}
 
-	if ((isset($_GET["mode"]))) {
-	  $mode = test_input($_GET["mode"]);
-	  if ($mode == "confirm") {
-		 $confirm = "yes";
-		} else if ($mode == "cancel") {
-		 $cancel = "yes";
-		}
-	}
+if (isset($_POST["confirm"])) {
+    $confirm = test_input($_POST["confirm"]);
+}
 
-	if (isset($_POST["confirm"])) {
-	  $confirm = test_input($_POST["confirm"]);
-	}
+if (isset($_POST["cancel"])) {
+    $cancel = test_input($_POST["cancel"]);
+}
 
-  if ($confirm == "yes") {
+if ($confirm == "yes") {
 
-    $stmt = $conn->prepare("UPDATE ".DBPREFIX."addresses SET confirm = ? WHERE email = ?");
-    $stmt->bind_param('ss', $confirm, $email);
+    $token = "";
+    $token = $_GET["token"];
+    $stmt = $conn->prepare("UPDATE " . DBPREFIX . "addresses SET confirm = ? WHERE token = ?");
+    $stmt->bind_param('ss', $confirm, $token);
 
     if ($stmt->execute()) {
 
-      $blnmsgsent = true;
+        $blnmsgsent = true;
 
     }
 
-		if ($blnmsgsent) {
+    if ($blnmsgsent) {
 
-		  getEndMsg("confirmed",$email);
+        $stmt = $conn->prepare("SELECT email FROM " . DBPREFIX . "addresses WHERE token = ?");
+        $stmt->bind_param("s", $token);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-		} else {
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $email = $row["email"];
+        }
 
-		  getEndMsg("confirmerr",$email);
+        $endmsg = "";
+        $endmsg = getUserMessage("confirmed");
+        $endmsg = str_replace("#EMAIL#", $email, $endmsg);
+        $endmsg = str_replace("#SITETITLE#", $siteTitle, $endmsg);
+        echo $endmsg;
 
-		}
+    } else {
 
-  } else if ($confirm == "no") {
+        $endmsg = "";
+        $endmsg = getUserMessage("confirmerr");
+        $endmsg = str_replace("#EMAIL#", $email, $endmsg);
+        $endmsg = str_replace("#SITETITLE#", $siteTitle, $endmsg);
+        echo $endmsg;
 
-		$stmt = $conn->prepare("SELECT * FROM ".DBPREFIX."addresses WHERE email = ?");
-		$stmt->bind_param("s", $email);
-		$stmt->execute();
-		$result = $stmt->get_result();
+    }
+
+} else if ($confirm == "no") {
+
+    $stmt = $conn->prepare("SELECT * FROM " . DBPREFIX . "addresses WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
 
-		  getEndMsg("alreadysubbed",$email);
+        $endmsg = "";
+        $endmsg = getUserMessage("alreadysubbed");
+        $endmsg = str_replace("#EMAIL#", $email, $endmsg);
+        $endmsg = str_replace("#SITETITLE#", $siteTitle, $endmsg);
+        echo $endmsg;
 
-	  } else {
+    } else {
 
-      $param1 = date("Y-m-d");
-      $stmt = $conn->prepare("INSERT INTO ".DBPREFIX."addresses (email,datDate,confirm) VALUES (?,?,?)");
-      $stmt->bind_param('sss', $email, $param1, $confirm);
+        $emailMsg = $token = "";
+        $token = randChrs(15);
 
-      if ($stmt->execute()) {
+        $param1 = date("Y-m-d");
+        $stmt = $conn->prepare("INSERT INTO " . DBPREFIX . "addresses (email,datDate,confirm,token) VALUES (?,?,?,?)");
+        $stmt->bind_param('ssss', $email, $param1, $confirm, $token);
 
-			  $nemail = str_replace("@","~",$email);
-		    $nemail = str_replace(".","-",$nemail);	
+        if ($stmt->execute()) {
 
-				$subject = $siteTitle." Newsletter confirmation";
+            $subject = $siteTitle . " Newsletter confirmation";
+            $emailMsg = str_replace("#SITETITLE#",$siteTitle, $confirmemail);
+            $emailMsg = str_replace("#EMAIL#", $email, $emailMsg);
+            $emailMsg = str_replace("#CR#", "&copy;", $emailMsg);
+            $emailMsg = str_replace("#YEAR#", date("Y"), $emailMsg);
+            $emailMsg = str_replace("#CONFIRMREWRITE#", "<a href=\"" . $http . "://" . $domain . "/confirm/" . $token . "/yes/\">Confirm</a>", $emailMsg);
+            $emailMsg = str_replace("#CONFIRMNOREWRITE#", "<a href=\"" . $http . "://" . $domain . NEWSDIR . "includes/process.php?token=" . $token . "&confirm=yes\">Confirm</a>", $emailMsg);
+            $emailMsg = str_replace("#CANCELREWRITE#", "<a href=\"" . $http . "://" . $domain . "/cancel/" . $token . "/yes/\">Unsubscribe</a>", $emailMsg);
+            $emailMsg = str_replace("#CANCELNOREWRITE#", "<a href=\"" . $http . "://" . $domain . NEWSDIR . "includes/process.php?token=" . $token . "&cancel=yes\">Unsubscribe</a>", $emailMsg);
 
-				$emailMsg = "Thank you for subscribing to our Newsletter<br /><br />";
-				$emailMsg .= "Please confirm your subscription by clicking on the link below.<br /><br />";
+            $emailMsg = wordwrap($emailMsg, 70);
 
-				if (REWRITE == "yes") {
-					$emailMsg .= "<a"." href=\"".$http."://".$domain."/process/".$nemail."/confirm/\">Confirm</a><br /><br />";
-				} else {
-					$emailMsg .= "<a"." href=\"".$http."://".$domain.GBDIR."includes/process.php?email=".$nemail."&mode=confirm\">Confirm</a><br /><br />";
-				}
+            if (send_mail($email, $subject, $emailMsg, "", "", "", "")) {
 
-				$emailMsg .= "You received this email because you submitted this email address to our mailing list.<br />";
-				$emailMsg .= "If you did not subscribe or wish to be removed from our list - click on the link below<br /><br />"; 
+                $blnmsgsent = true;
 
-				if (REWRITE == "yes") {
-					$emailMsg .= "<a href=\"".$http."://".$domain."/process/".$nemail."/cancel/\">Cancel</a><br /><br />";
-				} else {
-					$emailMsg .= "<a href=\"".$http."://".$domain.GBDIR."includes/process.php?email=".$nemail."&mode=cancel\">Cancel</a><br /><br />";
-				}
+            }
 
-				$emailMsg .= "Our Thanks<br />".$siteTitle;
-				$emailMsg = wordwrap($emailMsg,70);
+            if ($blnmsgsent) {
 
-				if (send_mail($email, $subject, $emailMsg, "", "", "", "")) {
-				  
-				  $blnmsgsent = true;
+                $endmsg = "";
+                $endmsg = getUserMessage("thanks");
+                $endmsg = str_replace("#EMAIL#", $email, $endmsg);
+                $endmsg = str_replace("#SITETITLE#", $siteTitle, $endmsg);
+                echo $endmsg;
 
-        }
+            } else {
 
-				if ($blnmsgsent) {
-				  
-				  getEndMsg("thanks",$email);
+                $endmsg = "";
+                $endmsg = getUserMessage("thankserr");
+                $endmsg = str_replace("#EMAIL#", $email, $endmsg);
+                $endmsg = str_replace("#SITETITLE#", $siteTitle, $endmsg);
+                echo $endmsg;
+
+            }
 
         } else {
 
-				  getEndMsg("thankserr",$email);
-			
-				}
-	
-      } else {
+            $endmsg = "";
+            $endmsg = getUserMessage("adderr");
+            $endmsg = str_replace("#EMAIL#", $email, $endmsg);
+            $endmsg = str_replace("#SITETITLE#", $siteTitle, $endmsg);
+            echo $endmsg;
 
-			  getEndMsg("adderr",$email);
+        }
+    }
 
-      }
-		}
+} else {
 
-  } else {
+    if ($cancel == "yes") {
 
-	  if ($cancel == "yes") {
+        $blnDelete = false;
+        $stmt = $email = $token = "";
 
-		  $blnDelete = false;
+        $token = $_GET["token"];
+        $stmt = $conn->prepare("SELECT * FROM " . DBPREFIX . "addresses WHERE token = ?");
+        $stmt->bind_param("s", $token);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-			$stmt = $conn->prepare("SELECT * FROM ".DBPREFIX."addresses WHERE email = ?");
-			$stmt->bind_param("s", $email);
-			$stmt->execute();
+        if ($result->num_rows > 0) {
 
-      if ($result->num_rows > 0) {
-			
-			  $blnDelete = true;
-	
-			} else {
+            $row = $result->fetch_assoc();
+            $email = $row["email"];
 
-			  getEndMsg("notfound",$email);
+            $blnDelete = true;
 
-			}
+        } else {
 
-			if ($blnDelete) {
+            $endmsg = "";
+            $endmsg = getUserMessage("notfound");
+            $endmsg = str_replace("#EMAIL#", $email, $endmsg);
+            $endmsg = str_replace("#SITETITLE#", $siteTitle, $endmsg);
+            echo $endmsg;
 
-			  $stmt = "";
-				$stmt = $conn->prepare("DELETE FROM ".DBPREFIX."addresses WHERE email = ?");
-				$stmt->bind_param("s", $email);
+        }
 
-				if ($stmt->execute()) {
+        if ($blnDelete) {
 
-				  getEndMsg("removed",$email);
+            $stmt = "";
+            $stmt = $conn->prepare("DELETE FROM " . DBPREFIX . "addresses WHERE token = ?");
+            $stmt->bind_param("s", $token);
 
-				} else {
+            if ($stmt->execute()) {
 
-				  getEndMsg("removederr",$email);
+                $endmsg = "";
+                $endmsg = getUserMessage("removed");
+                $endmsg = str_replace("#EMAIL#", $email, $endmsg);
+                $endmsg = str_replace("#SITETITLE#", $siteTitle, $endmsg);
+                echo $endmsg;
 
-				}
-      }
-	  }
-  }
-	mysqli_close($conn);
-  echo "  </div>";
-	include "footer.php";
+            } else {
+
+                $endmsg = "";
+                $endmsg = getUserMessage("removederr");
+                $endmsg = str_replace("#EMAIL#", $email, $endmsg);
+                $endmsg = str_replace("#SITETITLE#", $siteTitle, $endmsg);
+                echo $endmsg;
+
+            }
+        }
+    }
+}
+mysqli_close($conn);
+echo "  </div>";
+include "footer.php";
 ?>

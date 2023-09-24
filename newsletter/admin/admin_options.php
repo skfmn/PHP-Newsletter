@@ -151,6 +151,25 @@ if (isset($_POST["chmstgs"])) {
 
 }
 
+if (isset($_POST["confirmemail"])) {
+
+    $param1 = "";
+    $param1 = trim($_POST["tempbody"]);
+    $param1 = str_replace("\n", "", $param1);
+
+    $stmt = mysqli_prepare($conn, "UPDATE " . DBPREFIX . "settings SET confirm_email = ?");
+    $stmt->bind_param('s', $param1);
+
+    if ($stmt->execute()) {
+        $_SESSION["msg"] = "siu";
+    } else {
+        $_SESSION["msg"] = "error";
+    }
+
+    redirect($redirect . "admin/admin_options.php");
+    ob_end_flush();
+}
+
 include "../includes/header.php";
 ?>
 <div id="main" class="container">
@@ -201,6 +220,9 @@ if ($result->num_rows > 0) {
 }
 ?>
       </div>
+    <div class="12u$">
+        <hr class="major" style="margin: 1em 0;" />
+    </div>
       <h3>User Messages</h3>
 <?php
 
@@ -236,7 +258,7 @@ if ($result->num_rows > 0) {
                 <tr>
                   <td colspan="2">
                     <input type=submit value="Save User Messages" class="button fit">
-                    Use: #email# for users email address. Use: #sitetitle# to insert your sites title.
+                    Use: #EMAIL# for users email address. Use: #SITETITLE# to insert your sites title.
                   </td>
                 </tr>
               </tfoot>
@@ -303,6 +325,9 @@ if ($result->num_rows > 0) {
         $usechecked = "";
         $useonoff = "Off";
     }
+
+    $confirmemail = str_replace("\n", "", $confirmemail);
+    $confirmemail = str_replace("\r", "", $confirmemail);
     ?>
       <div class="row">
         <div class="12u$" style="padding-bottom:10px;">
@@ -419,6 +444,78 @@ if ($result->num_rows > 0) {
           </div>
         </div>
         <div class="12u$">
+            <hr class="major" style="margin: 1em 0;" />
+        </div>
+        <div class="12u$">
+            <div class="row">
+                <div class="6u 12u$(medium)"><h3>Confirmation Email</h3></div>
+                <div class="6u$ 12u$(medium)"><a class="button picimg" href="#notice" style="font-size:12px;float:right;">HELP</a></div>
+            </div>
+
+            <form action="admin_options.php" method="post">
+                <input type="hidden" name="confirmemail" value="yes" />
+                <textarea name="tempbody" id="tempbody" rows="25" wrap="soft"></textarea>
+                <script>
+                    CKEDITOR.replace( 'tempbody', {
+                    height: 250,
+                    customConfig: '<?php echo NEWSDIR; ?>assets/js/email-config.js'
+                    });
+                    CKEDITOR.instances.tempbody.setData('<?php echo $confirmemail; ?>');
+                </script>
+                <input class="button fit" type="submit" name="submit" value="Save Email" style="margin-top:10px;" />
+            </form>
+        </div>
+        <div class="12u$">
+            <hr class="major" style="margin: 1em 0;" />
+        </div>
+         <div class="12u$">
+            <h3>Attachments</h3>
+            <form action="uploadattach.php?dla=no&p=o" method="post" enctype="multipart/form-data">
+                <h5>Upload Attachment</h5>
+                <div class="row">
+                    <div class="8u 12u$(medium)">
+                        <input class="button fit" type="file" name="attachs[]" size="20" multiple />
+                    </div>
+                    <div class="4u$ 12u$(medium)">
+                        <input type="submit" name="submit" value="Upload" class="button fit" />
+                    </div>
+                </div>
+            </form>
+            Delete Attachment(s)
+            <form action="uploadattach.php?dla=yes&p=o" method="post">
+                <div class="row">
+                    <div class="7u 12u$(medium)">
+                        <div class="select-wrapper">
+                            <select name="selectattach[]" id="selectattach" size="4" multiple>
+<?php
+        $baseDir = BASEDIR;
+        $dir = str_replace("\\\\", "\\", $baseDir . "newsletter\\admin\\attachs\\");
+        if (is_dir($dir)) {
+            if ($dh = opendir($dir)) {
+                while (($file = readdir($dh)) !== false) {
+                    if ($file == '.' or $file == '..')
+                        continue;
+                    echo "<option value=". $file .">" . $file . "</option>";
+                }
+                closedir($dh);
+            } else {
+                echo "<option value=\"\">No Attachments</option>";
+            }
+        }
+        ?>
+							</select>
+                        </div>
+                    </div>
+                    <div class="5u$ 12u$(medium)">
+                        <input class="button fit" type="submit" name="submit" value="Delete Attachment(s)" />
+                    </div>
+                </div>
+            </form>
+         </div>
+        <div class="12u$">
+            <hr class="major" style="margin: 1em 0;" />
+        </div>
+        <div class="12u$">
           <h3>URL Rewrite</h3>
           <span>If you have modRewrite for either Windows or Unix you can add the code below to the appropriate file then upload it to the root folder of your website. if you are using a folder other than "newsletter" you will need to change it in the files.</span>
           <br /><br />
@@ -476,9 +573,6 @@ RewriteRule ^thankyou /newsletter/includes/process.php?thank=you"
             </code>
           </pre>
         </div>
-          <div class="-4u 4u$ 12u$(medium)">
-              <a class="button" target="_blank" href="phpinfo.php">PHP Info</a>
-          </div>
 <?php
 }
 mysqli_close($conn);
@@ -486,5 +580,22 @@ mysqli_close($conn);
       </div>
     </div>
   </div>
+</div>
+<div style="display:none;max-width:600px;" id="notice">
+    <h2>HELP</h2>
+    <p>
+        You can use the following snippets:
+        <ul>
+            <li>#SITETITLE# - Sites Title</li>
+            <li>#EMAIL# - Subscribers email</li>
+            <li>#CR# - For the &copy; symbol</li>
+            <li>#YEAR# - For the current year</li>
+            <li>#CONFIRMREWRITE# - Confirmation link if Rewrite is enabled</li>
+            <li>#CONFIRMNOREWRITE# - Confirmation link if Rewrite is disabled</li>
+            <li>#CANCELREWRITE# - Cancellation link if Rewrite is enabled</li>
+            <li>#CANCELNOREWRITE# - Cancellation link if Rewrite is disabled</li>
+        </ul>
+        NOTE: Confirmation and Cancel links will be auto generated depending on the snippet.
+    </p>
 </div>
 <?php include "../includes/footer.php" ?>

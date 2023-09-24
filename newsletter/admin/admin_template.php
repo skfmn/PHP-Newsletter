@@ -156,44 +156,42 @@ include "../includes/header.php";
     <header>
         <h2>Manage Templates</h2>
     </header>
-    <div class="row uniform">
-        <div class="-3u 6u$ 12u$(medium)">
-            <span>
-                You have <?php echo $intDCount; ?> Drafts and <?php echo $intTCount; ?> Templates. <a class="urlimg fancybox.ajax" href="imageurls.php">Get Image URLs</a>
-            </span>
-        </div>
-        <div class="-2u 4u 12u$(medium)">
-            <label for="loadtemp">Template Title</label>
-            <div class="select-wrapper">
-                <?php selectLoadTemplate(); ?>
+
+    <div class="row">
+        <div class="-4u 4u$ 12u$(medium)">
+            <h5>You have <?php echo $intDCount; ?> Drafts and <?php echo $intTCount; ?> Templates.</h5>
+            <div class="row">
+                <div class="12u$">
+                    <a class="picimg button fit fancybox.ajax" href="imageurls.asp">Get Image URLs</a>
+                </div>
+                <div class="12u$">
+                    <div class="select-wrapper">
+                        <?php selectLoadTemplate(); ?>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="4u$ 12u$(medium)">
-            <label for="tempdescr">Template Description</label>
-            <input type="text" id="tempdescr" name="tempdescr" value="" size="30" required form="template" />
         </div>
     </div>
     <form action="admin_template.php" id="template" method="post">
         <input type="hidden" name="tempid" id="tempid" value="" />
         <div class="row uniform">
             <div class="-1u 10u$ 12u$(medium)">
-                <div class="12u 12u$(small)" style="padding-bottom:10px;">
-                    <label for="nwsubject">Title</label>
-                    <input type="text" name="temptitle" id="temptitle" value="" size="30" />
+                <div class="row">
+                    <div class="6u 12u$(small)" style="padding-bottom:10px;">
+                        <label for="nwsubject">Title</label>
+                        <input type="text" name="temptitle" id="temptitle" value="" size="30" />
+                    </div>
+                    <div class="6u$ 12u$(medium)">
+                        <label for="tempdescr">Template Description</label>
+                        <input type="text" id="tempdescr" name="tempdescr" value="" size="30" required form="template" />
+                    </div>
+                    <div class="12u  12u$(small)">
+                        <textarea name="tempbody" id="tempbody" cols="65" rows="25" wrap="soft"></textarea>
+                        <script>
+                             CKEDITOR.replace( 'tempbody');
+                        </script>
+                    </div>
                 </div>
-                <div class="12u  12u$(small)">
-                    <textarea name="tempbody" id="tempbody" cols="65" rows="25" wrap="soft"></textarea>
-                    <script>
-                        CKEDITOR.filter.allowedContentRules = true;
-                        CKEDITOR.config.allowedContent = true;
-                        CKEDITOR.config.removeButtons = 'Templates,Save,Print,Flash,NewPage';  
-                        CKEDITOR.config.enterMode = CKEDITOR.ENTER_BR;
-                        CKEDITOR.replace( 'tempbody', {
-                        extraAllowedContent: 'header; content; footer; section; article'
-                        });
-                    </script>
-                </div>
-
                 <div class="row" style="padding-top:10px;">
                     <div class="6u 12u$(small)">
                         <input type="submit" name="save" class="button fit" value="Save" />

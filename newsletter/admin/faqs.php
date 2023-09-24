@@ -49,7 +49,7 @@
   </div>
   <div id="main" class="container" align="center" style="margin-top:-75px;">
     <div class="row 50%">
-      <div class="12u 12u$(medium)">
+      <div class="12u$">
         <div id="accordion">
           <h3>Whats the difference between a Template and a Draft?</h3>
           <div style="text-align:left;">A Template is a finished Draft that can be used for sending Newsletters.<br />A Draft is an unfinished Template not suitable for sending Newsletters.<br />In fact, you can't send a Draft. You have to save it as a Template first.<br /><br />If you're still confused sacrifice an iPhone to the APP gods!</div>

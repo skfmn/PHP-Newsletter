@@ -81,21 +81,41 @@ if (isset($_GET["save"])) {
     mysqli_close($conn);
 }
 
+$conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
+
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$sql = "SELECT * FROM " . DBPREFIX . "newsletter WHERE news_save = 'draft'";
+$result = $conn->query($sql);
+if ($result->num_rows > 0) {
+    $intDCount = mysqli_num_rows($result);
+}
+
+$sql = "SELECT * FROM " . DBPREFIX . "newsletter WHERE news_save = 'template'";
+$result = $conn->query($sql);
+if ($result->num_rows > 0) {
+    $intTCount = mysqli_num_rows($result);
+}
+mysqli_close($conn);
 include "../includes/header.php";
 ?>
 <script src="//cdn.ckeditor.com/4.6.2/full/ckeditor.js"></script>
 <div id="main" class="container">
-    <div class="row">
-        <div class="-3u 6u 12u(medium)">
-            <span>
-                <a class="picimg fancybox.ajax" href="imageurls.php">Get Image URLs</a>
-            </span>
-        </div>
-    </div>
-
     <header>
         <h2 style="text-align:center;">Create a Template</h2>
     </header>
+    <div class="row">
+        <div class="-4u 4u$ 12u$(medium)">
+            <h5>You have <?php echo $intDCount; ?> Drafts and <?php echo $intTCount; ?> Templates.</h5>
+            <div class="row">
+                <div class="12u$">
+                    <a class="urlimg button fit fancybox.ajax" href="imageurls.php">Get Image URLs</a>
+                </div>
+            </div>
+        </div>
+    </div>
     <form method="post">
         <div class="row uniform">
             <div class="-1u 10u$ 12u$(medium)">
@@ -117,13 +137,7 @@ include "../includes/header.php";
                     <div class="12u$">
                         <textarea name="tempbody" id="tempbody" wrap="soft" style="height:300px;" required></textarea>
                         <script>
-                            CKEDITOR.filter.allowedContentRules = true;
-                            CKEDITOR.config.format_tags = 'div;h1;h2;h3;pre';
-                            CKEDITOR.config.enterMode = CKEDITOR.ENTER_BR;
-                            CKEDITOR.config.removeButtons = 'Templates,Save,Print,Flash,NewPage';
-                            CKEDITOR.replace('tempbody', {
-                                extraAllowedContent: 'header; content; footer; section; article'
-                            });
+                                CKEDITOR.replace('tempbody');
                         </script>
                     </div>
                 </div>

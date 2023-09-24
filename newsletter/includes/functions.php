@@ -1,9 +1,11 @@
 <?php
 $siteTitle = $domain = $smtpServer = $smtpPort = $smtpEmail = $smtpPassword = "";
-$smtpDebug = $smtpsecure = $rewrite = $smtpuse = "";
+$smtpDebug = $smtpsecure = $rewrite = $smtpuse = $confirmemail = "";
+
+//$version = "1.2.1";
 
 $saveFile = "";
-$saveFile = $_SERVER["APPL_PHYSICAL_PATH"] . str_replace("/", "\\", GBDIR) . "admin\images";
+$saveFile = $_SERVER["APPL_PHYSICAL_PATH"] . str_replace("/", "\\", NEWSDIR) . "admin\images";
 $saveFile = str_replace("\\\\", "\\", $saveFile);
 define("SAVEFILE", $saveFile);
 
@@ -50,6 +52,7 @@ if ($result->num_rows > 0) {
     }
     $smtpuse = $row["smtpuse"];
     $rewrite = $row["rewrite"];
+    $confirmemail = $row["confirm_email"];
 
     define('SITETITLE', $siteTitle);
     define('DOMAIN', $domain);
@@ -61,6 +64,7 @@ if ($result->num_rows > 0) {
     define('SMTPSECURE', $smtpsecure);
     define('SMTPUSE', $smtpuse);
     define('REWRITE', $rewrite);
+    define('CONFIRMEMAIL', $confirmemail);
 
 }
 mysqli_close($conn);
@@ -96,17 +100,33 @@ if ($cookieID <> "") {
 
 }
 
+function rrmdir($src)
+{
+    $dir = opendir($src);
+    while (false !== ($file = readdir($dir))) {
+        if (($file != '.') && ($file != '..')) {
+            $full = $src . '/' . $file;
+            if (is_dir($full)) {
+                rrmdir($full);
+            } else {
+                unlink($full);
+            }
+        }
+    }
+    closedir($dir);
+    rmdir($src);
+}
+
+function trace($stxt) {
+    echo $stxt . "<br />";
+}
+
 function send_mail($tMail, $tSubject, $tMsg, $tFlag, $sAttach, $tUploadfile, $tSendas)
 {
 
     if ($sAttach !== "") {
 
         if (SMTPUSE == "yes") {
-
-            $ext = PHPMailer\PHPMailer\PHPMailer::mb_pathinfo($sAttach['userfile']['name'], PATHINFO_EXTENSION);
-
-            $newFileName = PHPMailer\PHPMailer\PHPMailer::mb_pathinfo($sAttach['userfile']['name'], PATHINFO_BASENAME);
-            $newFileName = str_replace("." . $ext, "", $newFileName);
 
             $mail = new PHPMailer\PHPMailer\PHPMailer();
             $mail->IsSMTP();
@@ -129,9 +149,9 @@ function send_mail($tMail, $tSubject, $tMsg, $tFlag, $sAttach, $tUploadfile, $tS
             $mail->Subject = $tSubject;
             $mail->Body = $tMsg;
 
-            if (!$mail->addAttachment($tUploadfile, $newFileName)) {
+            if (!$mail->addAttachment($sAttach)) {
                 if ($tFlag == "yes") {
-                    echo 'Failed to attach file ' . $tUploadfile . " - " . $newFileName . "\n";
+                    echo 'Failed to attach file ' . $sAttach . "\n";
                 } else {
                     return false;
                 }
@@ -325,6 +345,35 @@ function selectDeleteEmail()
 
 }
 
+function getUserMessage($sMsgName)
+{
+
+    $strTemp = "";
+
+    $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
+
+    if (!$conn) {
+
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
+    $param1 = $sMsgName;
+    $stmt = $conn->prepare("SELECT * FROM " . DBPREFIX . "endMsg WHERE endMsgName  = ?");
+    $stmt->bind_param("s", $param1);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $strTemp = trim($row["endMsg"]);
+    } else {
+        $strTemp = $sMsgName;
+    }
+
+    return $strTemp;
+    mysqli_close($conn);
+}
+
 function msgTrans($sMsg)
 {
     $strtmp = "";
@@ -342,10 +391,10 @@ function msgTrans($sMsg)
             $strtmp = "Forgot email address:";
             break;
         case "uls":
-            $strtmp = "Image uploaded:";
+            $strtmp = "File(s) uploaded:";
             break;
         case "ids":
-            $strtmp = "Image deleted:";
+            $strtmp = "File(s) deleted:";
             break;
         case "nadmin":
             $strtmp = "Can't change Admin info:";
@@ -441,8 +490,6 @@ function msgTrans($sMsg)
 function selectLoadTemplate()
 {
 
-    //$strLoad = "no";
-    //$strCount = 0;
 
     $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
 
@@ -465,7 +512,6 @@ function selectLoadTemplate()
             echo "  <option value=\"" . $row["newsletterID"] . "\">" . $row["news_title"] . "</option>\n";
         }
         echo "</select>\n";
-        //$strLoad = "yes";
 
     } else {
 
@@ -477,9 +523,6 @@ function selectLoadTemplate()
 
 function selectLoadDraft()
 {
-
-   // $strLoad = "no";
-   // $strCount = 0;
 
     $conn = mysqli_connect(HOST, USER, PASSWORD, DATABASE);
 
@@ -502,7 +545,6 @@ function selectLoadDraft()
             echo "  <option value=\"" . $row["newsletterID"] . "\">" . $row["news_title"] . "</option>\n";
         }
         echo "</select>\n";
-       // $strLoad = "yes";
 
     } else {
 
@@ -516,12 +558,17 @@ function randChrs($num)
 {
 
     $sWord = $rchr = "";
-    for ($x = 0; $x <= $num; $x++) {
+    $icount = 0;
+    for ($x = 0; $x <= 200; $x++) {
         $rchr = chr(rand(27, 126));
-        $pattern = "/[a-zA-Z0-9 , @$#%]/";
+        $pattern = "/[A-Z0-9]/";
 
         if (preg_match($pattern, $rchr)) {
             $sWord = $sWord . $rchr;
+            $icount++;
+            if ($icount === $num) {
+                break;
+            }
         }
     }
     return $sWord;
@@ -596,23 +643,19 @@ function getMessage($sMsg)
 function displayFancyMsg($sText)
 {
 ?>
-    <div style="display:none;">
-        <a id="textmsg" href="#displaymsg">Message</a>
-        <div id="displaymsg" style="background-color:#fff;text-align:left;border:0;">
-            <div class="left_menu_block" style="padding:5px;">
-                <div class="left_menu_top">
-                    <h2>Message</h2>
-                </div>
-                <div class="left_menu_center" align="center" style="background-color:#fff; padding-left:0px;">
-                    <span style="color:#444;">
-                        <?php echo $sText; ?>
-                    </span>
-                </div>
-                <div class="left_menu_bottom"></div>
-            </div>
+<div style="display: none">
+    <a id="textmsg" href="#displaymsg">Message</a>
+    <div id="displaymsg" style="width: 300px;">
+        <h2 style="text-align: left;">Message</h2>
+        <div style="text-align: center;">
+            <span style="color: #FF0000;">
+                <?php echo $sText; ?>
+            </span>
         </div>
+        <div class="left_menu_bottom"></div>
     </div>
-    <?php
+</div>
+<?php
 }
 
 function redirect($location)
